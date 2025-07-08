@@ -1,34 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { ThemeProvider, CssBaseline } from '@mui/material'
+import customTheme from './theme/theme'
+import OnboardingWelcome from './components/OnboardingWelcome'
+import OnboardingSkills from './components/OnboardingSkills'
+import OnboardingCareerGoals from './components/OnboardingCareerGoals'
+import AILoadingScreen from './components/AILoadingScreen'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <ThemeProvider theme={customTheme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          {/* Default route redirects to onboarding welcome */}
+          <Route path="/" element={<Navigate to="/onboarding/welcome" replace />} />
+          
+          {/* Onboarding Routes */}
+          <Route path="/onboarding/welcome" element={<OnboardingWelcome />} />
+          <Route path="/onboarding/skills" element={<OnboardingSkills />} />
+          <Route path="/onboarding/career-goals" element={<OnboardingCareerGoals />} />
+          <Route path="/onboarding/loading" element={<AILoadingScreen />} />
+          
+          {/* Main App Routes (placeholder for now) */}
+          <Route path="/dashboard" element={<div>Dashboard Coming Soon</div>} />
+          <Route path="/jobs" element={<div>Explore Jobs Coming Soon</div>} />
+          <Route path="/skills" element={<div>My Skills Coming Soon</div>} />
+          <Route path="/profile" element={<div>Profile Coming Soon</div>} />
+          
+          {/* Catch all route - redirect to welcome */}
+          <Route path="*" element={<Navigate to="/onboarding/welcome" replace />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   )
 }
 
