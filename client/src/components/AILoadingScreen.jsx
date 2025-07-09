@@ -31,9 +31,9 @@ const AILoadingScreen = () => {
     const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
-          // Navigate to dashboard when complete
+          // Navigate to explore jobs when complete
           setTimeout(() => {
-            navigate('/dashboard')
+            navigate('/jobs')
           }, 1000)
           return 100
         }
