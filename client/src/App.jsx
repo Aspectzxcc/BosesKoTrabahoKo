@@ -5,6 +5,7 @@ import OnboardingWelcome from './components/OnboardingWelcome'
 import OnboardingSkills from './components/OnboardingSkills'
 import OnboardingCareerGoals from './components/OnboardingCareerGoals'
 import AILoadingScreen from './components/AILoadingScreen'
+import ExploreJobs from './components/ExploreJobs'
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
           
           {/* Main App Routes (placeholder for now) */}
           <Route path="/dashboard" element={<div>Dashboard Coming Soon</div>} />
-          <Route path="/jobs" element={<div>Explore Jobs Coming Soon</div>} />
+          <Route path="/jobs" element={<ExploreJobs />} />
           <Route path="/skills" element={<div>My Skills Coming Soon</div>} />
           <Route path="/profile" element={<div>Profile Coming Soon</div>} />
           

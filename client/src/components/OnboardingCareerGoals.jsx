@@ -88,7 +88,7 @@ const OnboardingCareerGoals = () => {
     console.log('Work Environment:', workEnvironment)
     console.log('Selected Goals:', selectedGoals)
     
-    navigate('/onboarding/loading')
+    navigate('/jobs')
   }
 
   const GoalCard = ({ goal, isSelected, onClick }) => (
