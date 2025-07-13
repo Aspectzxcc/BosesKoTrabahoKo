@@ -65,7 +65,9 @@ const AILoadingScreen = ({ userProfile = null }) => {
         }, 200)
 
         // Make the actual API call to generate job listings
+        console.log('Making API call to generate job listings...');
         const response = await getJobListings(profileData)
+        console.log('API call successful:', response);
         
         // Complete the progress
         setProgress(100)
@@ -84,7 +86,19 @@ const AILoadingScreen = ({ userProfile = null }) => {
         
       } catch (error) {
         console.error('Error generating job listings:', error)
-        setError('Failed to generate personalized job recommendations. Please try again.')
+        
+        // Provide more specific error messages
+        let errorMessage = 'Failed to generate personalized job recommendations. Please try again.';
+        
+        if (error.message.includes('connect')) {
+          errorMessage = 'Unable to connect to server. Please make sure the backend is running.';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'Request timed out. Please check your connection and try again.';
+        } else if (error.message.includes('Server error')) {
+          errorMessage = 'Server encountered an error. Please try again in a moment.';
+        }
+        
+        setError(errorMessage)
         setProgress(0)
         
         // Show error for 3 seconds then navigate back

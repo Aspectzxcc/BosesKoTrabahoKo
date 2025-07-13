@@ -1,4 +1,4 @@
-const groqService = require('../services/groqJobListingService.js');
+const groqService = require('../services/groqPromptService.js');
 
 const generateJobListings = async (req, res) => {
     try {
