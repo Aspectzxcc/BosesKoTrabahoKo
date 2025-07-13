@@ -11,7 +11,6 @@ import {
   MenuItem,
   Button,
   Paper,
-  LinearProgress,
   Alert,
   CircularProgress,
   Chip
@@ -246,71 +245,132 @@ const OnboardingWelcome = () => {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        background: 'linear-gradient(135deg, #e6f2fa 0%, #ffffff 100%)',
+        background: 'linear-gradient(135deg, #e6f2fa 0%, #f8fcff 50%, #ffffff 100%)',
         display: 'flex',
         alignItems: 'center',
-        py: 4
+        py: 6,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 20% 80%, rgba(41, 128, 185, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(230, 126, 34, 0.03) 0%, transparent 50%)',
+          pointerEvents: 'none'
+        }
       }}
     >
-      <Container maxWidth={false} sx={{ maxWidth: '1400px', mx: 'auto' }}>
+      <Container maxWidth={false} sx={{ maxWidth: '1400px', mx: 'auto', position: 'relative', zIndex: 1 }}>
         {/* Progress Indicator */}
-        <Box sx={{ mb: 4, maxWidth: '800px', mx: 'auto' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body2" color="#7f8c8d">
+        <Box sx={{ mb: 6, maxWidth: '800px', mx: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#7f8c8d',
+                fontWeight: 500,
+                fontSize: '0.95rem'
+              }}
+            >
               Step 1 of 4
             </Typography>
-            <Typography variant="body2" color="#7f8c8d">
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#2980b9',
+                fontWeight: 600,
+                fontSize: '0.95rem'
+              }}
+            >
               25% Complete
             </Typography>
           </Box>
-          <LinearProgress 
-            variant="determinate" 
-            value={25} 
-            sx={{
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: '#ecf0f1',
-              '& .MuiLinearProgress-bar': {
-                backgroundColor: '#2980b9',
-                borderRadius: 3
-              }
-            }}
-          />
+          <Box sx={{ 
+            backgroundColor: '#ecf0f1', 
+            borderRadius: '8px', 
+            height: '8px',
+            overflow: 'hidden',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <Box
+              sx={{
+                width: '25%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #2980b9 0%, #3498db 100%)',
+                borderRadius: '8px',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
+                  borderRadius: '8px'
+                }
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Main Form Container */}
         <Paper
           elevation={0}
           sx={{
-            p: 6,
-            borderRadius: '16px',
-            backgroundColor: '#ffffff',
-            boxShadow: '0 8px 32px rgba(41, 128, 185, 0.1)',
-            border: '1px solid #ecf0f1',
-            maxWidth: '600px',
-            mx: 'auto'
+            p: { xs: 4, md: 8 },
+            borderRadius: '24px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 20px 60px rgba(41, 128, 185, 0.15), 0 8px 32px rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(236, 240, 241, 0.8)',
+            maxWidth: '680px',
+            mx: 'auto',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #2980b9 0%, #3498db 50%, #e67e22 100%)',
+              borderRadius: '24px 24px 0 0'
+            }
           }}
         >
           {/* Header Section */}
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
             <Typography
-              variant="h2"
+              variant="h1"
               component="h1"
               sx={{
                 fontWeight: 700,
-                color: '#2980b9',
+                background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
                 mb: 3,
-                fontSize: { xs: '2rem', md: '2.5rem' }
+                fontSize: { xs: '2.2rem', md: '3rem' },
+                lineHeight: 1.2,
+                textShadow: '0 2px 4px rgba(41, 128, 185, 0.1)'
               }}
             >
               Welcome to Boses Ko Trabaho Ko!
             </Typography>
             <Typography
-              variant="h6"
+              variant="h5"
               sx={{
-                color: '#7f8c8d',
+                color: '#2c3e50',
                 fontWeight: 400,
-                lineHeight: 1.6
+                lineHeight: 1.6,
+                fontSize: { xs: '1.1rem', md: '1.3rem' },
+                maxWidth: '480px',
+                mx: 'auto',
+                opacity: 0.9
               }}
             >
               Let's start by getting to know you. Tell us about your academic journey.
@@ -318,7 +378,7 @@ const OnboardingWelcome = () => {
           </Box>
 
           {/* Form Fields - Single Column Layout */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <TextField
               fullWidth
               label="Full Name"
@@ -329,15 +389,27 @@ const OnboardingWelcome = () => {
               helperText={errors.fullName}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
-                  height: '60px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  height: '64px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
                   '& fieldset': {
-                    borderColor: '#7f8c8d',
-                    borderWidth: 1
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                   },
                   '&:hover fieldset': {
                     borderColor: '#2980b9'
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
                   },
                   '&.Mui-focused fieldset': {
                     borderColor: '#2980b9',
@@ -346,7 +418,11 @@ const OnboardingWelcome = () => {
                 },
                 '& .MuiInputLabel-root': {
                   color: '#2c3e50',
-                  fontWeight: 500
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  '&.Mui-focused': {
+                    color: '#2980b9'
+                  }
                 }
               }}
             />
@@ -356,19 +432,39 @@ const OnboardingWelcome = () => {
               error={!!errors.highestEducation}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
-                  height: '60px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  height: '64px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
                   '& fieldset': {
-                    borderColor: '#7f8c8d',
-                    borderWidth: 1
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                   },
                   '&:hover fieldset': {
                     borderColor: '#2980b9'
                   },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
+                  },
                   '&.Mui-focused fieldset': {
                     borderColor: '#2980b9',
                     borderWidth: 2
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#2c3e50',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  '&.Mui-focused': {
+                    color: '#2980b9'
                   }
                 }
               }}
@@ -376,7 +472,11 @@ const OnboardingWelcome = () => {
               <InputLabel 
                 sx={{ 
                   color: '#2c3e50',
-                  fontWeight: 500
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  '&.Mui-focused': {
+                    color: '#2980b9'
+                  }
                 }}
               >
                 Highest Education
@@ -417,15 +517,27 @@ const OnboardingWelcome = () => {
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#ecf0f1',
-                      borderRadius: '12px',
-                      height: '60px',
+                      backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                      borderRadius: '16px',
+                      height: '64px',
+                      fontSize: '1.1rem',
+                      transition: 'all 0.3s ease',
                       '& fieldset': {
-                        borderColor: '#7f8c8d',
-                        borderWidth: 1
+                        borderColor: 'rgba(127, 140, 141, 0.3)',
+                        borderWidth: 2
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                       },
                       '&:hover fieldset': {
                         borderColor: '#2980b9'
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
                       },
                       '&.Mui-focused fieldset': {
                         borderColor: '#2980b9',
@@ -434,23 +546,33 @@ const OnboardingWelcome = () => {
                     },
                     '& .MuiInputLabel-root': {
                       color: '#2c3e50',
-                      fontWeight: 500
+                      fontWeight: 600,
+                      fontSize: '1.1rem',
+                      '&.Mui-focused': {
+                        color: '#2980b9'
+                      }
                     }
                   }}
                 />
 
                 {/* Course Validation Results */}
                 {courseValidation && !courseValidation.error && (
-                  <Box sx={{ mt: 2 }}>
+                  <Box sx={{ mt: 3 }}>
                     {courseValidation.isValid ? (
                       <Alert 
                         severity="success" 
                         sx={{ 
-                          borderRadius: '12px',
+                          borderRadius: '16px',
+                          backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                          border: '2px solid rgba(39, 174, 96, 0.3)',
+                          '& .MuiAlert-icon': {
+                            fontSize: '1.5rem'
+                          },
                           '& .MuiAlert-message': {
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 1
+                            gap: 2,
+                            fontSize: '1rem'
                           }
                         }}
                       >
@@ -482,11 +604,17 @@ const OnboardingWelcome = () => {
                       <Alert 
                         severity="warning"
                         sx={{ 
-                          borderRadius: '12px',
+                          borderRadius: '16px',
+                          backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                          border: '2px solid rgba(243, 156, 18, 0.3)',
+                          '& .MuiAlert-icon': {
+                            fontSize: '1.5rem'
+                          },
                           '& .MuiAlert-message': {
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 1
+                            gap: 2,
+                            fontSize: '1rem'
                           }
                         }}
                       >
@@ -520,7 +648,16 @@ const OnboardingWelcome = () => {
                 {courseValidation?.error && (
                   <Alert 
                     severity="error" 
-                    sx={{ mt: 2, borderRadius: '12px' }}
+                    sx={{ 
+                      mt: 3, 
+                      borderRadius: '16px',
+                      backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                      border: '2px solid rgba(231, 76, 60, 0.3)',
+                      '& .MuiAlert-icon': {
+                        fontSize: '1.5rem'
+                      },
+                      fontSize: '1rem'
+                    }}
                   >
                     {courseValidation.error}
                   </Alert>
@@ -533,19 +670,39 @@ const OnboardingWelcome = () => {
               error={!!errors.graduationYear}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
-                  height: '60px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  height: '64px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
                   '& fieldset': {
-                    borderColor: '#7f8c8d',
-                    borderWidth: 1
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                   },
                   '&:hover fieldset': {
                     borderColor: '#2980b9'
                   },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
+                  },
                   '&.Mui-focused fieldset': {
                     borderColor: '#2980b9',
                     borderWidth: 2
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#2c3e50',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  '&.Mui-focused': {
+                    color: '#2980b9'
                   }
                 }
               }}
@@ -553,7 +710,11 @@ const OnboardingWelcome = () => {
               <InputLabel 
                 sx={{ 
                   color: '#2c3e50',
-                  fontWeight: 500
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  '&.Mui-focused': {
+                    color: '#2980b9'
+                  }
                 }}
               >
                 Graduation Year / Expected
@@ -577,33 +738,53 @@ const OnboardingWelcome = () => {
             </FormControl>
 
             {/* Next Button */}
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Box sx={{ textAlign: 'center', mt: 6 }}>
               <Button
                 variant="contained"
                 size="large"
                 onClick={handleNext}
                 disabled={!canSubmitForm()}
                 sx={{
-                  backgroundColor: canSubmitForm() ? '#2980b9' : '#7f8c8d',
+                  background: canSubmitForm() 
+                    ? 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)' 
+                    : 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
                   color: '#ffffff',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: '1.2rem',
-                  px: 8,
-                  py: 3,
-                  borderRadius: '12px',
+                  px: 10,
+                  py: 3.5,
+                  borderRadius: '16px',
                   textTransform: 'none',
-                  boxShadow: canSubmitForm() ? '0 4px 16px rgba(41, 128, 185, 0.3)' : 'none',
+                  boxShadow: canSubmitForm() 
+                    ? '0 8px 32px rgba(41, 128, 185, 0.4), 0 4px 16px rgba(0, 0, 0, 0.1)' 
+                    : '0 4px 16px rgba(149, 165, 166, 0.3)',
+                  border: 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  '&::before': canSubmitForm() ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                    transition: 'left 0.5s ease'
+                  } : {},
                   '&:hover': canSubmitForm() ? {
-                    backgroundColor: '#1f6396',
-                    boxShadow: '0 6px 20px rgba(41, 128, 185, 0.4)',
-                    transform: 'translateY(-2px)'
+                    background: 'linear-gradient(135deg, #1f6396 0%, #2980b9 100%)',
+                    boxShadow: '0 12px 40px rgba(41, 128, 185, 0.5), 0 6px 20px rgba(0, 0, 0, 0.15)',
+                    transform: 'translateY(-3px) scale(1.02)',
+                    '&::before': {
+                      left: '100%'
+                    }
                   } : {},
                   '&.Mui-disabled': {
-                    backgroundColor: '#7f8c8d',
-                    color: '#ffffff',
-                    opacity: 0.7
+                    background: 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    opacity: 0.8
                   },
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               >
                 {isValidatingCourse ? (
@@ -619,12 +800,19 @@ const OnboardingWelcome = () => {
               {/* Helper text for disabled state */}
               {!canSubmitForm() && !isValidatingCourse && (
                 <Typography 
-                  variant="caption" 
+                  variant="body2" 
                   sx={{ 
                     display: 'block', 
-                    mt: 2, 
+                    mt: 3, 
                     color: '#7f8c8d',
-                    fontStyle: 'italic' 
+                    fontStyle: 'italic',
+                    fontSize: '0.95rem',
+                    backgroundColor: 'rgba(127, 140, 141, 0.1)',
+                    padding: '12px 20px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(127, 140, 141, 0.2)',
+                    maxWidth: '400px',
+                    mx: 'auto'
                   }}
                 >
                   {(() => {

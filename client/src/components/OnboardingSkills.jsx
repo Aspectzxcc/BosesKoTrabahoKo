@@ -7,7 +7,8 @@ import {
   Chip,
   TextField,
   Button,
-  Grid
+  Grid,
+  LinearProgress
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
@@ -17,6 +18,7 @@ const OnboardingSkills = () => {
   const [selectedSoftSkills, setSelectedSoftSkills] = useState([])
   const [careerInterests, setCareerInterests] = useState('')
   const [customSkill, setCustomSkill] = useState('')
+  const [customSoftSkill, setCustomSoftSkill] = useState('')
 
   // Pre-defined hard skills matching the image
   const hardSkills = [
@@ -57,6 +59,13 @@ const OnboardingSkills = () => {
     }
   }
 
+  const handleAddCustomSoftSkill = () => {
+    if (customSoftSkill.trim() && !selectedSoftSkills.includes(customSoftSkill.trim())) {
+      setSelectedSoftSkills(prev => [...prev, customSoftSkill.trim()])
+      setCustomSoftSkill('')
+    }
+  }
+
   const handleNext = () => {
     // Get existing onboarding data from localStorage
     const existingData = JSON.parse(localStorage.getItem('bktk_onboarding_data') || '{}')
@@ -89,21 +98,49 @@ const OnboardingSkills = () => {
       onClick={onClick}
       variant={isSelected ? 'filled' : 'outlined'}
       sx={{
-        margin: 0.5,
+        margin: 0,
         padding: '8px 16px',
-        height: '40px',
-        borderRadius: '20px',
-        fontSize: '0.875rem',
-        fontWeight: 500,
+        height: '44px',
+        borderRadius: '22px',
+        fontSize: '0.9rem',
+        fontWeight: 600,
         cursor: 'pointer',
-        border: isSelected ? 'none' : '2px solid #bdc3c7',
-        backgroundColor: isSelected ? '#2980b9' : 'white',
-        color: isSelected ? 'white' : '#2c3e50',
+        border: isSelected ? 'none' : '2px solid rgba(127, 140, 141, 0.3)',
+        backgroundColor: isSelected 
+          ? 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)' 
+          : 'rgba(255, 255, 255, 0.8)',
+        color: isSelected ? '#ffffff' : '#2c3e50',
+        backdropFilter: 'blur(10px)',
+        boxShadow: isSelected 
+          ? '0 6px 20px rgba(41, 128, 185, 0.3), 0 3px 10px rgba(0, 0, 0, 0.1)' 
+          : '0 3px 10px rgba(0, 0, 0, 0.05)',
+        position: 'relative',
+        overflow: 'hidden',
+        flexShrink: 0,
+        '&::before': isSelected ? {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+          zIndex: -1
+        } : {},
         '&:hover': {
-          backgroundColor: isSelected ? '#1e6091' : '#ecf0f1',
-          borderColor: isSelected ? '#1e6091' : '#2980b9'
+          backgroundColor: isSelected 
+            ? 'linear-gradient(135deg, #1f6396 0%, #2980b9 100%)' 
+            : 'rgba(236, 240, 241, 0.9)',
+          borderColor: isSelected ? 'transparent' : '#2980b9',
+          transform: 'translateY(-2px) scale(1.03)',
+          boxShadow: isSelected 
+            ? '0 10px 28px rgba(41, 128, 185, 0.4), 0 5px 14px rgba(0, 0, 0, 0.15)' 
+            : '0 6px 20px rgba(41, 128, 185, 0.2), 0 3px 10px rgba(0, 0, 0, 0.1)'
         },
-        transition: 'all 0.2s ease-in-out'
+        '&:active': {
+          transform: 'translateY(0) scale(1.01)'
+        },
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     />
   )
@@ -113,54 +150,160 @@ const OnboardingSkills = () => {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        backgroundColor: '#e6f2fa',
+        background: 'linear-gradient(135deg, #e6f2fa 0%, #f8fcff 50%, #ffffff 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        py: 4
+        py: 6,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 20% 80%, rgba(41, 128, 185, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(230, 126, 34, 0.03) 0%, transparent 50%)',
+          pointerEvents: 'none'
+        }
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth={false} sx={{ maxWidth: '1200px', mx: 'auto', position: 'relative', zIndex: 1 }}>
+        {/* Progress Indicator */}
+        <Box sx={{ mb: 6, maxWidth: '800px', mx: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#7f8c8d',
+                fontWeight: 500,
+                fontSize: '0.95rem'
+              }}
+            >
+              Step 2 of 4
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#2980b9',
+                fontWeight: 600,
+                fontSize: '0.95rem'
+              }}
+            >
+              50% Complete
+            </Typography>
+          </Box>
+          <Box sx={{ 
+            backgroundColor: '#ecf0f1', 
+            borderRadius: '8px', 
+            height: '8px',
+            overflow: 'hidden',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <Box
+              sx={{
+                width: '50%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #2980b9 0%, #3498db 100%)',
+                borderRadius: '8px',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
+                  borderRadius: '8px'
+                }
+              }}
+            />
+          </Box>
+        </Box>
+
         <Paper
           elevation={0}
           sx={{
-            p: 6,
-            borderRadius: '16px',
-            backgroundColor: 'white',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+            p: { xs: 4, md: 8 },
+            borderRadius: '24px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 20px 60px rgba(41, 128, 185, 0.15), 0 8px 32px rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(236, 240, 241, 0.8)',
+            maxWidth: '1000px',
+            mx: 'auto',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #2980b9 0%, #3498db 50%, #e67e22 100%)',
+              borderRadius: '24px 24px 0 0'
+            }
           }}
         >
           {/* Main Header */}
           <Typography
-            variant="h4"
+            variant="h1"
             component="h1"
             sx={{
-              color: '#2c3e50',
-              fontWeight: 600,
+              background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 700,
               textAlign: 'center',
-              mb: 5,
-              fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
+              mb: 8,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              lineHeight: 1.2,
+              textShadow: '0 2px 4px rgba(41, 128, 185, 0.1)'
             }}
           >
             What are your current skills and interests?
           </Typography>
 
           {/* Hard Skills Section */}
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 8 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 3,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 4,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #2980b9 0%, #3498db 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               What technical or specific skills do you have?
             </Typography>
             
-            <Box sx={{ mb: 3 }}>
+            <Box 
+              sx={{ 
+                mb: 4,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1.5,
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start'
+              }}
+            >
+              {/* Pre-defined hard skills */}
               {hardSkills.map((skill) => (
                 <SkillChip
                   key={skill}
@@ -169,10 +312,33 @@ const OnboardingSkills = () => {
                   onClick={() => handleHardSkillToggle(skill)}
                 />
               ))}
+              
+              {/* Custom hard skills */}
+              {selectedHardSkills
+                .filter(skill => !hardSkills.includes(skill))
+                .map((skill) => (
+                  <SkillChip
+                    key={skill}
+                    skill={skill}
+                    isSelected={true}
+                    onClick={() => handleHardSkillToggle(skill)}
+                  />
+                ))}
             </Box>
 
             {/* Custom Skill Input */}
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 3 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                gap: 2, 
+                alignItems: 'stretch', 
+                mt: 4,
+                p: 3,
+                backgroundColor: 'rgba(41, 128, 185, 0.08)',
+                borderRadius: '16px',
+                border: '1px solid rgba(41, 128, 185, 0.2)'
+              }}
+            >
               <TextField
                 fullWidth
                 variant="outlined"
@@ -182,13 +348,27 @@ const OnboardingSkills = () => {
                 onKeyPress={(e) => e.key === 'Enter' && handleAddCustomSkill()}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#ecf0f1',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
                     borderRadius: '12px',
+                    height: '56px',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
                     '& fieldset': {
-                      borderColor: '#bdc3c7'
+                      borderColor: 'rgba(41, 128, 185, 0.3)',
+                      borderWidth: 2
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 12px rgba(41, 128, 185, 0.1)'
                     },
                     '&:hover fieldset': {
                       borderColor: '#2980b9'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#ffffff',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 6px 20px rgba(41, 128, 185, 0.2)'
                     },
                     '&.Mui-focused fieldset': {
                       borderColor: '#2980b9'
@@ -197,20 +377,34 @@ const OnboardingSkills = () => {
                 }}
               />
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={handleAddCustomSkill}
                 disabled={!customSkill.trim()}
                 sx={{
                   borderRadius: '12px',
-                  px: 3,
-                  py: 1.5,
-                  minWidth: 'auto',
-                  borderColor: '#2980b9',
-                  color: '#2980b9',
-                  '&:hover': {
-                    borderColor: '#1e6091',
-                    backgroundColor: 'rgba(41, 128, 185, 0.1)'
-                  }
+                  px: 4,
+                  py: 2,
+                  minWidth: '100px',
+                  height: '56px',
+                  background: customSkill.trim() 
+                    ? 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)' 
+                    : 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  boxShadow: customSkill.trim() 
+                    ? '0 4px 16px rgba(41, 128, 185, 0.3)' 
+                    : '0 2px 8px rgba(149, 165, 166, 0.3)',
+                  '&:hover': customSkill.trim() ? {
+                    background: 'linear-gradient(135deg, #1f6396 0%, #2980b9 100%)',
+                    boxShadow: '0 6px 20px rgba(41, 128, 185, 0.4)',
+                    transform: 'translateY(-2px)'
+                  } : {},
+                  '&.Mui-disabled': {
+                    background: 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
+                    color: 'rgba(255, 255, 255, 0.7)'
+                  },
+                  transition: 'all 0.3s ease'
                 }}
               >
                 Add
@@ -219,21 +413,41 @@ const OnboardingSkills = () => {
           </Box>
 
           {/* Soft Skills Section */}
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 8 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 3,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 4,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #27ae60 0%, #2ecc71 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               Which soft skills do you possess?
             </Typography>
             
-            <Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1.5,
+                justifyContent: 'flex-start',
+                alignItems: 'flex-start'
+              }}
+            >
+              {/* Pre-defined soft skills */}
               {softSkills.map((skill) => (
                 <SkillChip
                   key={skill}
@@ -242,19 +456,127 @@ const OnboardingSkills = () => {
                   onClick={() => handleSoftSkillToggle(skill)}
                 />
               ))}
+              
+              {/* Custom soft skills */}
+              {selectedSoftSkills
+                .filter(skill => !softSkills.includes(skill))
+                .map((skill) => (
+                  <SkillChip
+                    key={skill}
+                    skill={skill}
+                    isSelected={true}
+                    onClick={() => handleSoftSkillToggle(skill)}
+                  />
+                ))}
+            </Box>
+
+            {/* Custom Soft Skill Input */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                gap: 2, 
+                alignItems: 'stretch', 
+                mt: 4,
+                p: 3,
+                backgroundColor: 'rgba(39, 174, 96, 0.08)',
+                borderRadius: '16px',
+                border: '1px solid rgba(39, 174, 96, 0.2)'
+              }}
+            >
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Add a custom soft skill..."
+                value={customSoftSkill}
+                onChange={(e) => setCustomSoftSkill(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleAddCustomSoftSkill()}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: '12px',
+                    height: '56px',
+                    fontSize: '1rem',
+                    transition: 'all 0.3s ease',
+                    '& fieldset': {
+                      borderColor: 'rgba(39, 174, 96, 0.3)',
+                      borderWidth: 2
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 12px rgba(39, 174, 96, 0.1)'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#27ae60'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#ffffff',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 6px 20px rgba(39, 174, 96, 0.2)'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#27ae60'
+                    }
+                  }
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={handleAddCustomSoftSkill}
+                disabled={!customSoftSkill.trim()}
+                sx={{
+                  borderRadius: '12px',
+                  px: 4,
+                  py: 2,
+                  minWidth: '100px',
+                  height: '56px',
+                  background: customSoftSkill.trim() 
+                    ? 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)' 
+                    : 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  boxShadow: customSoftSkill.trim() 
+                    ? '0 4px 16px rgba(39, 174, 96, 0.3)' 
+                    : '0 2px 8px rgba(149, 165, 166, 0.3)',
+                  '&:hover': customSoftSkill.trim() ? {
+                    background: 'linear-gradient(135deg, #1e8449 0%, #27ae60 100%)',
+                    boxShadow: '0 6px 20px rgba(39, 174, 96, 0.4)',
+                    transform: 'translateY(-2px)'
+                  } : {},
+                  '&.Mui-disabled': {
+                    background: 'linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%)',
+                    color: 'rgba(255, 255, 255, 0.7)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Add
+              </Button>
             </Box>
           </Box>
 
           {/* Career Interests Section */}
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 8 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 3,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 4,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #e67e22 0%, #f39c12 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               What areas or industries pique your interest?
@@ -263,49 +585,87 @@ const OnboardingSkills = () => {
             <TextField
               fullWidth
               multiline
-              rows={3}
+              rows={4}
               variant="outlined"
               placeholder="e.g., Technology, Marketing, Healthcare, Education..."
               value={careerInterests}
               onChange={(e) => setCareerInterests(e.target.value)}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  fontSize: '1.1rem',
+                  lineHeight: 1.6,
+                  transition: 'all 0.3s ease',
                   '& fieldset': {
-                    borderColor: '#bdc3c7'
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                   },
                   '&:hover fieldset': {
                     borderColor: '#2980b9'
                   },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
+                  },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#2980b9'
+                    borderColor: '#2980b9',
+                    borderWidth: 2
                   }
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#2c3e50',
+                  fontWeight: 600,
+                  fontSize: '1.1rem'
                 }
               }}
             />
           </Box>
 
           {/* Navigation Button */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
             <Button
               variant="contained"
               size="large"
               onClick={handleNext}
               sx={{
-                backgroundColor: '#2980b9',
-                color: 'white',
-                px: 6,
-                py: 1.5,
-                borderRadius: '12px',
-                fontSize: '1rem',
-                fontWeight: 600,
+                background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+                color: '#ffffff',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+                px: 10,
+                py: 3.5,
+                borderRadius: '16px',
                 textTransform: 'none',
-                boxShadow: '0 4px 12px rgba(41, 128, 185, 0.3)',
+                boxShadow: '0 8px 32px rgba(41, 128, 185, 0.4), 0 4px 16px rgba(0, 0, 0, 0.1)',
+                border: 'none',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                  transition: 'left 0.5s ease'
+                },
                 '&:hover': {
-                  backgroundColor: '#1e6091',
-                  boxShadow: '0 6px 16px rgba(41, 128, 185, 0.4)'
-                }
+                  background: 'linear-gradient(135deg, #1f6396 0%, #2980b9 100%)',
+                  boxShadow: '0 12px 40px rgba(41, 128, 185, 0.5), 0 6px 20px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-3px) scale(1.02)',
+                  '&::before': {
+                    left: '100%'
+                  }
+                },
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               Next

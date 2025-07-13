@@ -114,26 +114,71 @@ const OnboardingCareerGoals = () => {
       sx={{
         cursor: 'pointer',
         height: '100%',
-        border: isSelected ? '2px solid #2980b9' : '2px solid #ecf0f1',
-        backgroundColor: isSelected ? 'rgba(41, 128, 185, 0.05)' : 'white',
-        transition: 'all 0.2s ease-in-out',
+        width: '100%',
+        maxWidth: '280px',
+        minHeight: '160px',
+        border: isSelected ? 'none' : '2px solid rgba(127, 140, 141, 0.3)',
+        backgroundColor: isSelected 
+          ? 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)' 
+          : 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '16px',
+        boxShadow: isSelected 
+          ? '0 8px 32px rgba(41, 128, 185, 0.3), 0 4px 16px rgba(0, 0, 0, 0.1)' 
+          : '0 4px 16px rgba(0, 0, 0, 0.05)',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        '&::before': isSelected ? {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+          zIndex: -1
+        } : {},
         '&:hover': {
-          border: '2px solid #2980b9',
-          backgroundColor: isSelected ? 'rgba(41, 128, 185, 0.1)' : 'rgba(41, 128, 185, 0.02)',
-          transform: 'translateY(-2px)',
-          boxShadow: '0 4px 12px rgba(41, 128, 185, 0.15)'
-        }
+          border: isSelected ? 'none' : '2px solid #2980b9',
+          backgroundColor: isSelected 
+            ? 'linear-gradient(135deg, #1f6396 0%, #2980b9 100%)' 
+            : 'rgba(236, 240, 241, 0.9)',
+          transform: 'translateY(-4px) scale(1.02)',
+          boxShadow: isSelected 
+            ? '0 12px 40px rgba(41, 128, 185, 0.4), 0 6px 20px rgba(0, 0, 0, 0.15)' 
+            : '0 8px 24px rgba(41, 128, 185, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1)'
+        },
+        '&:active': {
+          transform: 'translateY(-2px) scale(1.01)'
+        },
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
-      <CardContent sx={{ p: 3, textAlign: 'center' }}>
+      <CardContent 
+        sx={{ 
+          p: 4, 
+          textAlign: 'center', 
+          position: 'relative', 
+          zIndex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          flex: 1
+        }}
+      >
         <Typography
-          variant="h6"
+          variant="h5"
           component="h3"
           sx={{
-            color: isSelected ? '#2980b9' : '#2c3e50',
-            fontWeight: 600,
-            mb: 1,
-            fontSize: '1rem'
+            color: isSelected ? '#ffffff' : '#2c3e50',
+            fontWeight: 700,
+            mb: 2,
+            fontSize: { xs: '1.1rem', md: '1.2rem' },
+            textShadow: isSelected ? '0 2px 4px rgba(0, 0, 0, 0.2)' : 'none'
           }}
         >
           {goal.title}
@@ -141,9 +186,10 @@ const OnboardingCareerGoals = () => {
         <Typography
           variant="body2"
           sx={{
-            color: isSelected ? '#2980b9' : '#7f8c8d',
-            fontSize: '0.875rem',
-            lineHeight: 1.4
+            color: isSelected ? 'rgba(255, 255, 255, 0.9)' : '#7f8c8d',
+            fontSize: '0.95rem',
+            lineHeight: 1.5,
+            opacity: isSelected ? 0.95 : 0.8
           }}
         >
           {goal.description}
@@ -157,48 +203,144 @@ const OnboardingCareerGoals = () => {
       sx={{
         minHeight: '100vh',
         minWidth: '100vw',
-        backgroundColor: '#e6f2fa',
+        background: 'linear-gradient(135deg, #e6f2fa 0%, #f8fcff 50%, #ffffff 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        py: 4
+        py: 6,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 20% 80%, rgba(41, 128, 185, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(230, 126, 34, 0.03) 0%, transparent 50%)',
+          pointerEvents: 'none'
+        }
       }}
     >
-      <Container maxWidth="md">
+      <Container maxWidth={false} sx={{ maxWidth: '1200px', mx: 'auto', position: 'relative', zIndex: 1 }}>
+        {/* Progress Indicator */}
+        <Box sx={{ mb: 6, maxWidth: '800px', mx: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#7f8c8d',
+                fontWeight: 500,
+                fontSize: '0.95rem'
+              }}
+            >
+              Step 3 of 4
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#2980b9',
+                fontWeight: 600,
+                fontSize: '0.95rem'
+              }}
+            >
+              75% Complete
+            </Typography>
+          </Box>
+          <Box sx={{ 
+            backgroundColor: '#ecf0f1', 
+            borderRadius: '8px', 
+            height: '8px',
+            overflow: 'hidden',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <Box
+              sx={{
+                width: '75%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #2980b9 0%, #3498db 100%)',
+                borderRadius: '8px',
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%)',
+                  borderRadius: '8px'
+                }
+              }}
+            />
+          </Box>
+        </Box>
+
         <Paper
           elevation={0}
           sx={{
-            p: 6,
-            borderRadius: '16px',
-            backgroundColor: 'white',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)'
+            p: { xs: 4, md: 8 },
+            borderRadius: '24px',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 20px 60px rgba(41, 128, 185, 0.15), 0 8px 32px rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(236, 240, 241, 0.8)',
+            maxWidth: '1000px',
+            mx: 'auto',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #2980b9 0%, #3498db 50%, #e67e22 100%)',
+              borderRadius: '24px 24px 0 0'
+            }
           }}
         >
           {/* Main Header */}
           <Typography
-            variant="h4"
+            variant="h1"
             component="h1"
             sx={{
-              color: '#2c3e50',
-              fontWeight: 600,
+              background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 700,
               textAlign: 'center',
-              mb: 5,
-              fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
+              mb: 8,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              lineHeight: 1.2,
+              textShadow: '0 2px 4px rgba(41, 128, 185, 0.1)'
             }}
           >
             Where do you see yourself in the future?
           </Typography>
 
           {/* Dream Job Section */}
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 6 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 2,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 3,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #2980b9 0%, #3498db 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               If you could have any job in the world, what would it be?
@@ -212,16 +354,31 @@ const OnboardingCareerGoals = () => {
               onChange={(e) => setDreamJob(e.target.value)}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  height: '64px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
                   '& fieldset': {
-                    borderColor: '#bdc3c7'
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(41, 128, 185, 0.1)'
                   },
                   '&:hover fieldset': {
                     borderColor: '#2980b9'
                   },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(41, 128, 185, 0.2)'
+                  },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#2980b9'
+                    borderColor: '#2980b9',
+                    borderWidth: 2
                   }
                 }
               }}
@@ -229,15 +386,26 @@ const OnboardingCareerGoals = () => {
           </Box>
 
           {/* Work Environment Section */}
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 8 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 2,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 3,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #27ae60 0%, #2ecc71 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               Preferred Work Environment
@@ -249,16 +417,31 @@ const OnboardingCareerGoals = () => {
                 onChange={(e) => setWorkEnvironment(e.target.value)}
                 displayEmpty
                 sx={{
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
+                  backgroundColor: 'rgba(236, 240, 241, 0.5)',
+                  borderRadius: '16px',
+                  height: '64px',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#bdc3c7'
+                    borderColor: 'rgba(127, 140, 141, 0.3)',
+                    borderWidth: 2
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(236, 240, 241, 0.8)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 24px rgba(39, 174, 96, 0.1)'
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#2980b9'
+                    borderColor: '#27ae60'
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 32px rgba(39, 174, 96, 0.2)'
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#2980b9'
+                    borderColor: '#27ae60',
+                    borderWidth: 2
                   }
                 }}
               >
@@ -277,34 +460,66 @@ const OnboardingCareerGoals = () => {
           </Box>
 
           {/* Career Goals Section */}
-          <Box sx={{ mb: 5 }}>
+          <Box sx={{ mb: 8 }}>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h2"
               sx={{
                 color: '#2c3e50',
-                fontWeight: 600,
-                mb: 1,
-                fontSize: '1.125rem'
+                fontWeight: 700,
+                mb: 2,
+                fontSize: { xs: '1.3rem', md: '1.5rem' },
+                position: 'relative',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-8px',
+                  left: 0,
+                  width: '60px',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #e67e22 0%, #f39c12 100%)',
+                  borderRadius: '2px'
+                }
               }}
             >
               What's most important to you in a career?
             </Typography>
             
             <Typography
-              variant="body2"
+              variant="body1"
               sx={{
                 color: '#7f8c8d',
-                mb: 3,
-                fontSize: '0.875rem'
+                mb: 4,
+                fontSize: '1rem',
+                fontWeight: 500
               }}
             >
               Select all that apply
             </Typography>
             
-            <Grid container spacing={2}>
+            <Grid 
+              container 
+              spacing={3}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'stretch',
+                maxWidth: '900px',
+                mx: 'auto'
+              }}
+            >
               {careerGoals.map((goal) => (
-                <Grid item xs={12} sm={6} key={goal.id}>
+                <Grid 
+                  item 
+                  xs={12} 
+                  sm={6} 
+                  md={4}
+                  key={goal.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }}
+                >
                   <GoalCard
                     goal={goal}
                     isSelected={selectedGoals.includes(goal.id)}
@@ -316,30 +531,46 @@ const OnboardingCareerGoals = () => {
           </Box>
 
           {/* Finish Setup Button */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
             <Button
               variant="contained"
               size="large"
               onClick={handleFinishSetup}
               sx={{
                 background: 'linear-gradient(135deg, #2980b9 0%, #e67e22 100%)',
-                color: 'white',
-                px: 6,
-                py: 2,
-                borderRadius: '12px',
-                fontSize: '1.1rem',
-                fontWeight: 600,
+                color: '#ffffff',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+                px: 12,
+                py: 3.5,
+                borderRadius: '16px',
                 textTransform: 'none',
-                boxShadow: '0 6px 20px rgba(41, 128, 185, 0.3)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #1e6091 0%, #d35400 100%)',
-                  boxShadow: '0 8px 25px rgba(41, 128, 185, 0.4)',
-                  transform: 'translateY(-2px)'
+                boxShadow: '0 8px 32px rgba(41, 128, 185, 0.4), 0 4px 16px rgba(0, 0, 0, 0.1)',
+                border: 'none',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                  transition: 'left 0.5s ease'
                 },
-                transition: 'all 0.3s ease-in-out'
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #1f6396 0%, #d35400 100%)',
+                  boxShadow: '0 12px 40px rgba(41, 128, 185, 0.5), 0 6px 20px rgba(0, 0, 0, 0.15)',
+                  transform: 'translateY(-3px) scale(1.02)',
+                  '&::before': {
+                    left: '100%'
+                  }
+                },
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
-              Finish Setup & Go to Dashboard
+              Finish Profile Setup
             </Button>
           </Box>
         </Paper>
