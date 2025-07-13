@@ -19,7 +19,7 @@ cd BosesKoTrabahoKo
 #### Option 1: Quick Setup (Recommended)
 ```bash
 # Install dependencies for both server and client from root directory
-npm run install-all
+npm run init
 ```
 
 #### Option 2: Manual Setup
