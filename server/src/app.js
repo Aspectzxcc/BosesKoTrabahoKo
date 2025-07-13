@@ -8,8 +8,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const routes = require('./routes/index');
+
 // API Routes
-// app.use('/api/reading', readingRoutes);
+app.use('/api', routes);
 
 // Simple health check route
 app.get('/', (req, res) => {
