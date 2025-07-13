@@ -20,6 +20,38 @@ const generateJobListings = async (req, res) => {
     }
 };
 
+const validateCourse = async (req, res) => {
+    try {
+        // Extract course/major from request body
+        const { courseMajor } = req.body;
+        
+        if (!courseMajor) {
+            return res.status(400).json({ 
+                error: 'Course/major is required',
+                message: 'Please provide a course or major to validate'
+            });
+        }
+        
+        console.log('🎓 Course validation request:', {
+            courseMajor: courseMajor
+        });
+        
+        // Validate course using the groq service
+        const validationResult = await groqService.validateCourseMajor(courseMajor);
+        
+        console.log('✅ Course validation result:', validationResult);
+        
+        res.json(validationResult);
+    } catch (error) {
+        console.error('Error validating course:', error);
+        res.status(500).json({ 
+            error: 'Internal Server Error',
+            message: 'Failed to validate course/major'
+        });
+    }
+};
+
 module.exports = {
-    generateJobListings
+    generateJobListings,
+    validateCourse
 };

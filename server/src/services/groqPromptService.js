@@ -78,6 +78,21 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
         isRefreshGeneration: isRefresh
     });
 
+    // Validate the course/major if provided
+    let courseValidation = null;
+    if (welcome.majorCourse && welcome.majorCourse.trim() !== '') {
+        console.log('🎓 Validating course/major legitimacy...');
+        courseValidation = await validateCourseMajor(welcome.majorCourse);
+        
+        if (!courseValidation.isValid) {
+            console.warn('⚠️ Invalid course detected:', {
+                original: welcome.majorCourse,
+                reasoning: courseValidation.reasoning,
+                suggestions: courseValidation.suggestions
+            });
+        }
+    }
+
     try {
         // Create a comprehensive user context from the provided profile
         const userContext = 
@@ -86,7 +101,10 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
         
         **PERSONAL & ACADEMIC FOUNDATION:**
         - Name: ${welcome.fullName || 'Not provided'}
-        - Academic Major: ${welcome.majorCourse || 'General studies'} 
+        - Academic Major: ${courseValidation ? courseValidation.normalizedName : (welcome.majorCourse || 'General studies')}
+        ${courseValidation ? `- Course Validation: ${courseValidation.isValid ? '✅ LEGITIMATE' : '❌ QUESTIONABLE'} (${courseValidation.confidence} confidence)` : ''}
+        ${courseValidation && !courseValidation.isValid ? `- Validation Notes: ${courseValidation.reasoning}` : ''}
+        ${courseValidation && courseValidation.category ? `- Academic Category: ${courseValidation.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}` : ''}
         - Education Level: ${welcome.highestEducation || 'Undergraduate'}
         - Graduation Timeline: ${welcome.graduationYear || 'Recent graduate'}
         
@@ -315,6 +333,105 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
     }
 }
 
+// Function to validate course/major legitimacy
+async function validateCourseMajor(courseName) {
+    if (!courseName || courseName.trim() === '' || courseName.toLowerCase() === 'general studies') {
+        return {
+            isValid: true,
+            confidence: 'medium',
+            normalizedName: courseName || 'General Studies',
+            category: 'general',
+            reasoning: 'General or unspecified course'
+        }
+    }
+
+    const validationPrompt = `
+You are an expert in Philippine higher education and academic programs. Your task is to validate whether a given course/major is legitimate and properly formatted.
+
+### Validation Criteria:
+1. **Legitimacy**: Is this a real academic program offered by Philippine universities/colleges?
+2. **Proper Naming**: Is the course name properly formatted and spelled correctly?
+3. **Recognition**: Is this course recognized by CHED (Commission on Higher Education)?
+4. **Category Classification**: What field/category does this course belong to?
+
+### Instructions:
+Analyze the course name and return a JSON object with these fields:
+- isValid (boolean): true if legitimate course, false if fake/nonsensical
+- confidence (string): "high", "medium", or "low" based on certainty
+- normalizedName (string): properly formatted/corrected course name
+- category (string): field category (e.g., "engineering", "business", "healthcare", "education", "arts", "science", "technology", "social-science")
+- reasoning (string): brief explanation of validation decision
+- suggestions (array): alternative course names if original seems incorrect
+
+### Examples of Valid Courses:
+- "Bachelor of Science in Computer Science"
+- "Bachelor of Science in Nursing" 
+- "Bachelor of Arts in Psychology"
+- "Bachelor of Science in Civil Engineering"
+- "Bachelor of Science in Business Administration"
+
+### Examples of Invalid Courses:
+- "Wizard Studies"
+- "Dragon Training"
+- "Unicorn Management"
+- Random gibberish or clearly fictional programs
+
+Course to validate: "${courseName}"
+`;
+
+    try {
+        console.log('🔍 Validating course/major:', courseName);
+        
+        const validationResponse = await groq.chat.completions.create({
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are an expert validator of Philippine academic programs. Respond only with valid JSON."
+                },
+                {
+                    "role": "user", 
+                    "content": validationPrompt
+                }
+            ],
+            "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+            "temperature": 0.1, // Low temperature for consistent validation
+            "max_completion_tokens": 512,
+            "response_format": { "type": "json_object" }
+        });
+
+        const validationResult = JSON.parse(validationResponse.choices[0]?.message?.content || '{}');
+        
+        console.log('✅ Course validation result:', {
+            course: courseName,
+            isValid: validationResult.isValid,
+            confidence: validationResult.confidence,
+            normalizedName: validationResult.normalizedName
+        });
+
+        return {
+            isValid: validationResult.isValid ?? true,
+            confidence: validationResult.confidence ?? 'medium',
+            normalizedName: validationResult.normalizedName ?? courseName,
+            category: validationResult.category ?? 'general',
+            reasoning: validationResult.reasoning ?? 'Course validation completed',
+            suggestions: validationResult.suggestions ?? []
+        };
+
+    } catch (error) {
+        console.error('❌ Error validating course:', error.message);
+        // Fallback: assume course is valid if validation fails
+        return {
+            isValid: true,
+            confidence: 'low',
+            normalizedName: courseName,
+            category: 'general',
+            reasoning: 'Validation service unavailable - assumed valid',
+            suggestions: []
+        };
+    }
+}
+
 module.exports = {
-    generateJobPositions
+    generateJobPositions,
+    validateCourseMajor
 };

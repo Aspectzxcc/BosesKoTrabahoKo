@@ -20,6 +20,8 @@ api.interceptors.response.use(
     }
 );
 
-export const getJobListings = (userProfile, isRefresh = false) => api.post('/jobs', { userProfile, isRefresh });
+export const getJobListings = (userProfile, isRefresh = false) => api.post('/jobs/generate-jobs', { userProfile, isRefresh });
+
+export const validateCourse = (courseMajor) => api.post('/jobs/validate-course', { courseMajor });
 
 export default api;

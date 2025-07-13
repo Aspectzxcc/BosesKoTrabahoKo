@@ -4,6 +4,9 @@ const jobController = require('../controllers/jobController');
 const router = Router();
 
 // Route to generate job listings
-router.post('/', jobController.generateJobListings);
+router.post('/generate-jobs', jobController.generateJobListings);
+
+// Route to validate course/major
+router.post('/validate-course', jobController.validateCourse);
 
 module.exports = router;
