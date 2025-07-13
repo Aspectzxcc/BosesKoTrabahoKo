@@ -7,10 +7,10 @@ const groq = new Groq({
 
 const jobListerPrompt = `
 ### Role
-You are an expert AI career advisor and job lister for "Boses Ko Trabaho Ko," specializing in curating personalized job opportunities for undergraduate students and recent graduates based on their comprehensive profile data.
+You are an expert AI career advisor for "Boses Ko Trabaho Ko," specializing in identifying and recommending personalized job positions for undergraduate students and recent graduates based on their comprehensive profile data.
 
 ### Context
-You are tasked with generating realistic, highly-personalized job postings that align with a specific user's academic background, skills, career interests, and aspirations. The user has completed a detailed onboarding process providing information about their education, current skills (both hard and soft), career interests, dream job, work environment preferences, and career priorities.
+You are tasked with generating realistic, highly-personalized job position recommendations that align with a specific user's academic background, skills, career interests, and aspirations. The user has completed a detailed onboarding process providing information about their education, current skills (both hard and soft), career interests, dream job, work environment preferences, and career priorities.
 
 ### User Profile Structure
 The user profile contains the following information:
@@ -23,53 +23,46 @@ The user profile contains the following information:
 - **Career Priorities**: Array of selected goals (e.g., "high-salary", "work-life-balance", "career-growth", "job-security", "meaningful-work", "creative-freedom", "team-collaboration", "learning-opportunities")
 
 ### Task
-Generate a list of highly relevant, AI-curated job opportunities that are specifically tailored to the user's profile. Each job should align with their skills, interests, education level, and career aspirations while being appropriate for their experience level.
+Generate a list of highly relevant, AI-curated job position recommendations that are specifically tailored to the user's profile. Each position should align with their skills, interests, education level, and career aspirations while being appropriate for their experience level.
 
 ### Personalization Requirements
-- Prioritize jobs that match the user's stated career interests and dream job direction
+- Prioritize positions that match the user's stated career interests and dream job direction
 - Include positions that utilize their existing hard and soft skills
-- Consider their work environment preferences when setting location/remote options
-- Align job benefits and culture with their stated career priorities
+- Consider their work environment preferences and career priorities
 - Ensure experience requirements match their education level and graduation timeline
 - Factor in their major/course when relevant to the position
 
 ### Instructions
-- The output must be a JSON object with a single root key: "job_listings".
-- The value of "job_listings" must be a JSON array.
-- This array must contain between 3-5 JSON objects, each representing a unique job posting.
-- Each job object must contain the following keys and appropriate values:
-  - "job_id": A unique string identifier for the job (e.g., "job_2024_001").
-  - "job_title": The full title of the job position, aligned with user's interests and skill level.
-  - "company_name": The name of the company offering the job.
-  - "company_logo_url": A placeholder URL for the company's logo (e.g., "https://example.com/logo/company.png").
-  - "location": Geographic location that considers user's work environment preference.
-  - "job_type": Employment type appropriate for their experience level ("Full-time", "Internship", "Part-time", "Contract").
+- The output must be a JSON object with a single root key: "job_positions".
+- The value of "job_positions" must be a JSON array.
+- This array must contain between 3-5 JSON objects, each representing a unique job position recommendation.
+- Each position object must contain the following keys and appropriate values:
+  - "position_id": A unique string identifier for the position (e.g., "pos_2024_001").
+  - "position_title": The full title of the job position, aligned with user's interests and skill level.
   - "experience_level": Required experience level matching their profile ("Entry-Level", "No Experience Required", "Internship", "Fresh Graduate").
   - "match_score": An integer percentage (70-95) indicating relevance to the specific user profile.
-  - "posted_date": Recent posting date in YYYY-MM-DD format.
-  - "summary": A concise, compelling overview that highlights why this job suits the user.
-  - "full_description": A detailed paragraph describing the role and its appeal to this specific user.
-  - "responsibilities": Array of key responsibilities that align with user's skills and interests.
-  - "qualifications": Array of requirements that match the user's education level and background.
+  - "position_summary": A concise, compelling overview that highlights why this position suits the user.
+  - "role_description": A detailed paragraph describing the role and its appeal to this specific user.
+  - "key_responsibilities": Array of primary responsibilities that align with user's skills and interests.
+  - "required_qualifications": Array of educational and experience requirements that match the user's background.
   - "required_skills": Array of skills prioritizing those the user already possesses, with some growth opportunities.
-  - "company_overview": Company description that appeals to the user's career priorities and values.
-  - "company_website_url": Placeholder URL for the company's website.
-  - "apply_now_url": Placeholder URL for job application.
-  - "schedule": Work schedule that aligns with their work environment preference.
-  - "department": Relevant department based on their interests and major.
-  - "salary_range": Appropriate compensation for entry-level in the Philippines job market.
+  - "skill_development_opportunities": Array of skills the user can develop and learn in this position.
+  - "career_growth_path": Description of potential advancement opportunities from this position.
+  - "work_environment_fit": How this position aligns with their work environment preferences.
+  - "career_priorities_alignment": How this position matches their stated career priorities and values.
+  - "industry_sector": The industry or sector this position belongs to.
+  - "typical_salary_range": Appropriate compensation range for entry-level in the Philippines job market.
 
 ### Constraints
-- Generate 3-5 distinct job listings that offer variety while staying relevant to the user
+- Generate 3-5 distinct position recommendations that offer variety while staying relevant to the user
 - Match scores should reflect actual alignment with user profile (higher scores for better matches)
-- Ensure jobs are realistic for the Philippine job market and entry-level candidates
+- Ensure positions are realistic for the Philippine job market and entry-level candidates
 - Include a mix of industries if user has diverse interests, or focus on specific area if clearly defined
-- All URLs should be placeholder examples
 - Response must be valid JSON only, no additional text or markdown
-- Consider seasonal timing and current market trends for realistic posting dates
+- Focus on position characteristics rather than specific company details
 `;
 
-async function generateJobPositionList(userProfile = {}) {
+async function generateJobPositions(userProfile = {}) {
     try {
         // Create a comprehensive user context from the provided profile
         const userContext = 
@@ -113,16 +106,16 @@ async function generateJobPositionList(userProfile = {}) {
         ${userProfile.location || 'Philippines (flexible location)'}
         
         ### PERSONALIZATION INSTRUCTIONS ###
-        Based on this comprehensive profile, generate job listings that:
+        Based on this comprehensive profile, generate position recommendations that:
         1. Align with their stated career interests and dream job direction
         2. Utilize their existing hard and soft skills while offering growth opportunities
-        3. Match their work environment preferences
-        4. Reflect their career priorities and values in job benefits and company culture
-        5. Are appropriate for their education level and experience
-        6. Consider their major/course background when relevant
-        7. Provide realistic opportunities in the Philippine job market
+        3. Match their work environment preferences and career priorities
+        4. Are appropriate for their education level and experience
+        5. Consider their major/course background when relevant
+        6. Provide realistic opportunities in the Philippine job market
+        7. Focus on position characteristics, responsibilities, and growth potential
         
-        Generate highly personalized, relevant job recommendations for this specific user.
+        Generate highly personalized, relevant job position recommendations for this specific user.
         `
         .trim();
 
@@ -153,48 +146,43 @@ async function generateJobPositionList(userProfile = {}) {
         const aiResponse = JSON.parse(jsonStringResponse);
         
         // Validate the response structure
-        if (!aiResponse.job_listings || !Array.isArray(aiResponse.job_listings)) {
-            throw new Error('Invalid response format: missing or invalid job_listings array');
+        if (!aiResponse.job_positions || !Array.isArray(aiResponse.job_positions)) {
+            throw new Error('Invalid response format: missing or invalid job_positions array');
         }
 
-        // Return the job listings with enhanced validation and fallbacks
-        const jobListings = aiResponse.job_listings.map((job, index) => {
+        // Return the job positions with enhanced validation and fallbacks
+        const jobPositions = aiResponse.job_positions.map((position, index) => {
             // Ensure required fields exist with intelligent fallbacks based on user profile
             return {
-                job_id: job.job_id || `job_${Date.now()}_${index}`,
-                job_title: job.job_title || 'Entry-Level Position',
-                company_name: job.company_name || 'Growing Company',
-                company_logo_url: job.company_logo_url || 'https://example.com/logo/default.png',
-                location: job.location || (userProfile.workEnvironment === 'Remote' ? 'Remote' : 'Philippines'),
-                job_type: job.job_type || 'Full-time',
-                experience_level: job.experience_level || 'Entry-Level',
-                match_score: Math.min(Math.max(job.match_score || 75, 70), 95), // Ensure realistic match scores
-                posted_date: job.posted_date || new Date().toISOString().split('T')[0],
-                summary: job.summary || 'Great opportunity for fresh graduates to start their career',
-                full_description: job.full_description || 'Exciting entry-level position with growth opportunities',
-                responsibilities: job.responsibilities || ['Learn and grow in the role', 'Contribute to team projects', 'Develop professional skills'],
-                qualifications: job.qualifications || [`${userProfile.highestEducation || 'Bachelor\'s degree'} or equivalent`, 'Strong communication skills'],
-                required_skills: job.required_skills || ['Communication', 'Teamwork', 'Willingness to learn'],
-                company_overview: job.company_overview || 'Dynamic company focused on employee growth and development',
-                company_website_url: job.company_website_url || 'https://example.com',
-                apply_now_url: job.apply_now_url || 'https://example.com/apply',
-                schedule: job.schedule || (userProfile.workEnvironment === 'Flexible' ? 'Flexible schedule' : 'Monday-Friday'),
-                department: job.department || 'General',
-                salary_range: job.salary_range || 'PHP 18,000 - 25,000 / month'
+                position_id: position.position_id || `pos_${Date.now()}_${index}`,
+                position_title: position.position_title || 'Entry-Level Position',
+                experience_level: position.experience_level || 'Entry-Level',
+                match_score: Math.min(Math.max(position.match_score || 75, 70), 95), // Ensure realistic match scores
+                position_summary: position.position_summary || 'Great opportunity for fresh graduates to start their career',
+                role_description: position.role_description || 'Exciting entry-level position with growth opportunities',
+                key_responsibilities: position.key_responsibilities || ['Learn and grow in the role', 'Contribute to team projects', 'Develop professional skills'],
+                required_qualifications: position.required_qualifications || [`${userProfile.highestEducation || 'Bachelor\'s degree'} or equivalent`, 'Strong communication skills'],
+                required_skills: position.required_skills || ['Communication', 'Teamwork', 'Willingness to learn'],
+                skill_development_opportunities: position.skill_development_opportunities || ['Professional communication', 'Industry-specific knowledge', 'Leadership skills'],
+                career_growth_path: position.career_growth_path || 'Opportunity to advance to senior roles with experience and skill development',
+                work_environment_fit: position.work_environment_fit || `Suitable for ${userProfile.workEnvironment || 'flexible'} work preferences`,
+                career_priorities_alignment: position.career_priorities_alignment || 'Aligns with professional growth and learning opportunities',
+                industry_sector: position.industry_sector || 'General Business',
+                typical_salary_range: position.typical_salary_range || 'PHP 18,000 - 25,000 / month'
             };
         });
 
         return {
             success: true,
-            job_listings: jobListings,
-            total_jobs: jobListings.length,
+            job_positions: jobPositions,
+            total_positions: jobPositions.length,
             personalized_for: userProfile.fullName || 'User'
         };
 
     } catch (error) {
-        console.error('Error generating personalized job listings:', error);
+        console.error('Error generating personalized job positions:', error);
         
-        // Return a fallback response with sample jobs tailored to basic profile info
+        // Return a fallback response with sample positions tailored to basic profile info
         const fallbackTitle = userProfile.majorCourse 
             ? `${userProfile.majorCourse} Graduate Position`
             : 'Entry-Level Assistant';
@@ -206,36 +194,31 @@ async function generateJobPositionList(userProfile = {}) {
         return {
             success: false,
             error: error.message,
-            job_listings: [
+            job_positions: [
                 {
-                    job_id: `fallback_${Date.now()}`,
-                    job_title: fallbackTitle,
-                    company_name: 'Growing Company',
-                    company_logo_url: 'https://example.com/logo/default.png',
-                    location: userProfile.workEnvironment === 'Remote' ? 'Remote' : 'Manila, Philippines',
-                    job_type: 'Full-time',
+                    position_id: `fallback_${Date.now()}`,
+                    position_title: fallbackTitle,
                     experience_level: 'Entry-Level',
                     match_score: 80,
-                    posted_date: new Date().toISOString().split('T')[0],
-                    summary: `Great starting position for ${userProfile.majorCourse || 'fresh graduates'}`,
-                    full_description: 'An excellent opportunity to begin your career with a supportive team.',
-                    responsibilities: ['Learn company processes', 'Assist with daily operations', 'Participate in training programs'],
-                    qualifications: [userProfile.highestEducation || 'Bachelor\'s degree', 'Good communication skills'],
+                    position_summary: `Great starting position for ${userProfile.majorCourse || 'fresh graduates'}`,
+                    role_description: 'An excellent opportunity to begin your career with a supportive team and structured learning environment.',
+                    key_responsibilities: ['Learn company processes', 'Assist with daily operations', 'Participate in training programs'],
+                    required_qualifications: [userProfile.highestEducation || 'Bachelor\'s degree', 'Good communication skills'],
                     required_skills: fallbackSkills,
-                    company_overview: 'A dynamic company focused on employee growth and development.',
-                    company_website_url: 'https://example.com',
-                    apply_now_url: 'https://example.com/apply',
-                    schedule: userProfile.workEnvironment === 'Flexible' ? 'Flexible schedule' : 'Monday-Friday',
-                    department: 'Operations',
-                    salary_range: 'PHP 18,000 - 22,000 / month'
+                    skill_development_opportunities: ['Professional communication', 'Industry knowledge', 'Project management'],
+                    career_growth_path: 'Opportunity to advance to specialist or supervisory roles within 2-3 years',
+                    work_environment_fit: `Suitable for ${userProfile.workEnvironment || 'flexible'} work arrangements`,
+                    career_priorities_alignment: 'Provides learning opportunities and career growth potential',
+                    industry_sector: 'General Business',
+                    typical_salary_range: 'PHP 18,000 - 22,000 / month'
                 }
             ],
-            total_jobs: 1,
+            total_positions: 1,
             personalized_for: userProfile.fullName || 'User'
         };
     }
 }
 
 module.exports = {
-    generateJobPositionList
+    generateJobPositions
 };
