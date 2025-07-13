@@ -249,7 +249,12 @@ const JobDetail = () => {
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: '#2c3e50', lineHeight: 1.7, fontWeight: 500 }}>
-                {job.careerGrowth || 'This role type offers excellent opportunities for professional development and career advancement in your field of interest.'}
+                {typeof job.careerGrowth === 'string' 
+                  ? job.careerGrowth 
+                  : typeof job.careerGrowth === 'object' && job.careerGrowth !== null
+                    ? JSON.stringify(job.careerGrowth)
+                    : 'This role type offers excellent opportunities for professional development and career advancement in your field of interest.'
+                }
               </Typography>
             </Box>
           </Box>
@@ -341,7 +346,12 @@ const JobDetail = () => {
                 </Typography>
               </Box>
               <Typography variant="body2" sx={{ color: '#2c3e50', lineHeight: 1.7, fontWeight: 500 }}>
-                {job.workEnvironmentFit}
+                {typeof job.workEnvironmentFit === 'string' 
+                  ? job.workEnvironmentFit 
+                  : typeof job.workEnvironmentFit === 'object' && job.workEnvironmentFit !== null
+                    ? JSON.stringify(job.workEnvironmentFit)
+                    : 'This position offers a work environment that aligns with your preferences.'
+                }
               </Typography>
             </Box>
           )}
@@ -744,7 +754,12 @@ const JobDetail = () => {
                         letterSpacing: '0.02em'
                       }}
                     >
-                      {job.detailedDescription || job.description}
+                      {typeof (job.detailedDescription || job.description) === 'string' 
+                        ? (job.detailedDescription || job.description)
+                        : typeof (job.detailedDescription || job.description) === 'object' && (job.detailedDescription || job.description) !== null
+                          ? JSON.stringify(job.detailedDescription || job.description)
+                          : 'This is an excellent career opportunity that aligns with your background and aspirations.'
+                      }
                     </Typography>
                   </Box>
 
@@ -812,7 +827,12 @@ const JobDetail = () => {
                               mb: 1
                             }}
                           >
-                            {job.careerAlignment}
+                            {typeof job.careerAlignment === 'string' 
+                              ? job.careerAlignment 
+                              : typeof job.careerAlignment === 'object' && job.careerAlignment !== null
+                                ? JSON.stringify(job.careerAlignment)
+                                : 'This position aligns well with your career goals and aspirations.'
+                            }
                           </Typography>
                         </Box>
                       </Box>
