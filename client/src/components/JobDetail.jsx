@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -36,6 +36,11 @@ const JobDetail = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [showAIDialog, setShowAIDialog] = useState(false)
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // Get job data from navigation state
   const job = location.state?.job
