@@ -29,7 +29,6 @@ const OnboardingWelcome = () => {
   const educationLevels = [
     'High School',
     'Vocational/Technical Certificate',
-    'Associate Degree',
     'Bachelor\'s Degree',
     'Master\'s Degree',
     'Doctoral Degree'
@@ -53,6 +52,27 @@ const OnboardingWelcome = () => {
         [field]: ''
       }));
     }
+
+    // Clear major/course field if education level doesn't require it
+    if (field === 'highestEducation') {
+      const requiresMajor = ['Bachelor\'s Degree', 'Master\'s Degree', 'Doctoral Degree'].includes(value);
+      if (!requiresMajor) {
+        setFormData(prev => ({
+          ...prev,
+          majorCourse: ''
+        }));
+        // Clear any major/course errors
+        setErrors(prev => ({
+          ...prev,
+          majorCourse: ''
+        }));
+      }
+    }
+  };
+
+  // Helper function to determine if major field should be shown
+  const shouldShowMajorField = () => {
+    return ['Bachelor\'s Degree', 'Master\'s Degree', 'Doctoral Degree'].includes(formData.highestEducation);
   };
 
   const validateForm = () => {
@@ -62,7 +82,9 @@ const OnboardingWelcome = () => {
       newErrors.fullName = 'Full name is required';
     }
     
-    if (!formData.majorCourse.trim()) {
+    // Only require major/course for Bachelor's degree and higher
+    const requiresMajor = ['Bachelor\'s Degree', 'Master\'s Degree', 'Doctoral Degree'].includes(formData.highestEducation);
+    if (requiresMajor && !formData.majorCourse.trim()) {
       newErrors.majorCourse = 'Major/Course is required';
     }
     
@@ -200,38 +222,6 @@ const OnboardingWelcome = () => {
               }}
             />
 
-            <TextField
-              fullWidth
-              label="Major/Course"
-              placeholder="e.g., Computer Science, Business Administration"
-              value={formData.majorCourse}
-              onChange={(e) => handleInputChange('majorCourse', e.target.value)}
-              error={!!errors.majorCourse}
-              helperText={errors.majorCourse}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#ecf0f1',
-                  borderRadius: '12px',
-                  height: '60px',
-                  '& fieldset': {
-                    borderColor: '#7f8c8d',
-                    borderWidth: 1
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#2980b9'
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#2980b9',
-                    borderWidth: 2
-                  }
-                },
-                '& .MuiInputLabel-root': {
-                  color: '#2c3e50',
-                  fontWeight: 500
-                }
-              }}
-            />
-
             <FormControl 
               fullWidth 
               error={!!errors.highestEducation}
@@ -279,6 +269,41 @@ const OnboardingWelcome = () => {
                 </Typography>
               )}
             </FormControl>
+
+            {/* Conditionally render Major/Course field */}
+            {shouldShowMajorField() && (
+              <TextField
+                fullWidth
+                label="Major/Course"
+                placeholder="e.g., Computer Science, Business Administration"
+                value={formData.majorCourse}
+                onChange={(e) => handleInputChange('majorCourse', e.target.value)}
+                error={!!errors.majorCourse}
+                helperText={errors.majorCourse}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#ecf0f1',
+                    borderRadius: '12px',
+                    height: '60px',
+                    '& fieldset': {
+                      borderColor: '#7f8c8d',
+                      borderWidth: 1
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#2980b9'
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#2980b9',
+                      borderWidth: 2
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#2c3e50',
+                    fontWeight: 500
+                  }
+                }}
+              />
+            )}
 
             <FormControl 
               fullWidth 
