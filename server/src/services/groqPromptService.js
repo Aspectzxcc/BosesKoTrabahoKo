@@ -30,7 +30,7 @@ When analyzing the user profile, pay special attention to:
 6. **Growth Trajectory**: Clear advancement path that builds toward their aspirations
 
 ### Enhanced Instructions
-- Generate exactly 5 unique, highly relevant job positions
+- Generate exactly 10 unique, highly relevant job positions
 - Match scores should range 85-99%, with higher scores for better profile alignment
 - Each position must include SPECIFIC examples of how it matches the user's profile
 - Use the user's actual skills, interests, and goals in descriptions
