@@ -46,7 +46,7 @@ npm run dev    # Development mode (auto-restart)
 # or
 npm start      # Production mode
 ```
-The backend will run on http://localhost:3001 (or your configured port)
+The backend will run on http://localhost:3000 (or your configured port)
 
 ### Frontend (React + Vite)
 ```bash
