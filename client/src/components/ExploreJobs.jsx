@@ -476,8 +476,8 @@ const ExploreJobs = () => {
           }}
         >
           <CardContent sx={{ p: 3 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={4}>
+            <Grid container spacing={2} alignItems="stretch">
+              <Grid item xs={12} sm={6} md={4}>
                 <TextField
                   fullWidth
                   variant="outlined"
@@ -492,9 +492,11 @@ const ExploreJobs = () => {
                     )
                   }}
                   sx={{
+                    height: '100%',
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: 'white',
                       borderRadius: '8px',
+                      height: '56px',
                       '& fieldset': {
                         borderColor: '#bdc3c7'
                       },
@@ -509,15 +511,16 @@ const ExploreJobs = () => {
                 />
               </Grid>
 
-              <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
+              <Grid item xs={12} sm={6} md={2.5}>
+                <FormControl fullWidth sx={{ height: '100%' }}>
                   <InputLabel>Industry</InputLabel>
                   <Select
                     value={industryFilter}
                     onChange={(e) => setIndustryFilter(e.target.value)}
                     sx={{
                       backgroundColor: 'white',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
+                      height: '56px'
                     }}
                   >
                     <MenuItem value="">All Industries</MenuItem>
@@ -531,15 +534,16 @@ const ExploreJobs = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
+              <Grid item xs={12} sm={6} md={2.5}>
+                <FormControl fullWidth sx={{ height: '100%' }}>
                   <InputLabel>Job Type</InputLabel>
                   <Select
                     value={jobType}
                     onChange={(e) => setJobType(e.target.value)}
                     sx={{
                       backgroundColor: 'white',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
+                      height: '56px'
                     }}
                   >
                     <MenuItem value="">All Types</MenuItem>
@@ -553,7 +557,7 @@ const ExploreJobs = () => {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12} md={2}>
+              <Grid item xs={12} sm={6} md={3} sx={{ display: 'flex', alignItems: 'stretch' }}>
                 <Button
                   variant="contained"
                   fullWidth
@@ -564,7 +568,11 @@ const ExploreJobs = () => {
                     borderRadius: '8px',
                     textTransform: 'none',
                     fontWeight: 600,
-                    py: 1.5,
+                    height: '56px',
+                    minHeight: '56px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     '&:hover': {
                       backgroundColor: '#1e6091'
                     }
@@ -684,11 +692,17 @@ const ExploreJobs = () => {
           </Box>
         )}
 
-        {/* Back to Dashboard Button */}
+        {/* Reset Profile Button */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
           <Button
             variant="text"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              // Clear all stored data
+              localStorage.removeItem('bktk_job_data')
+              localStorage.removeItem('bktk_converted_jobs')
+              // Navigate back to onboarding
+              navigate('/')
+            }}
             sx={{
               color: '#7f8c8d',
               borderRadius: '8px',
@@ -699,7 +713,7 @@ const ExploreJobs = () => {
               }
             }}
           >
-            ← Back to Dashboard
+            ← Reset Profile & Start Over
           </Button>
         </Box>
       </Container>

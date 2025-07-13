@@ -219,19 +219,41 @@ const JobDetail = () => {
         }}
       >
         {/* Back Navigation */}
-        <Box sx={{ width: '100%', mb: 3, display: 'flex', justifyContent: 'flex-start' }}>
+        <Box sx={{ width: '100%', mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Button
-          startIcon={<ArrowBack />}
-          onClick={() => fromExploreJobs ? navigate('/jobs') : navigate(-1)}
-          sx={{
-            color: '#7f8c8d',
-            textTransform: 'none',
-            mb: 3,
-            '&:hover': {
-              backgroundColor: 'rgba(127, 140, 141, 0.05)'
-            }
-          }}          >
+            startIcon={<ArrowBack />}
+            onClick={() => fromExploreJobs ? navigate('/jobs') : navigate(-1)}
+            sx={{
+              color: '#7f8c8d',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: 'rgba(127, 140, 141, 0.05)'
+              }
+            }}
+          >
             Back to Position Listings
+          </Button>
+          
+          <Button
+            variant="text"
+            onClick={() => {
+              // Clear all stored data
+              localStorage.removeItem('bktk_job_data')
+              localStorage.removeItem('bktk_converted_jobs')
+              // Navigate back to onboarding
+              navigate('/')
+            }}
+            sx={{
+              color: '#7f8c8d',
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: 'rgba(127, 140, 141, 0.05)'
+              }
+            }}
+          >
+            Reset Profile & Start Over
           </Button>
         </Box>
 
