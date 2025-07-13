@@ -6,20 +6,33 @@ import {
   Fade,
   Alert
 } from '@mui/material'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getJobListings } from '../services/api'
 
-const AILoadingScreen = ({ userProfile = null }) => {
+const AILoadingScreen = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [progress, setProgress] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState(null)
   const hasCalledAPI = useRef(false) // Ref to track if API has been called
 
-  // Get user profile from props, location state, or default
-  const profileData = userProfile || location.state?.userProfile || {
+  // Get user profile from localStorage (onboarding data) or use fallback
+  const getOnboardingData = () => {
+    try {
+      const storedData = localStorage.getItem('bktk_onboarding_data')
+      if (storedData) {
+        const onboardingData = JSON.parse(storedData)
+        console.log('Retrieved onboarding data from localStorage:', onboardingData)
+        return onboardingData
+      }
+    } catch (error) {
+      console.error('Error retrieving onboarding data from localStorage:', error)
+    }
+    return null
+  }
+
+  const profileData = getOnboardingData() || {
     fullName: 'User',
     majorCourse: 'General Studies',
     highestEducation: 'Undergraduate',
@@ -31,6 +44,8 @@ const AILoadingScreen = ({ userProfile = null }) => {
     workEnvironment: 'Flexible',
     careerPriorities: ['learning-opportunities', 'career-growth']
   }
+
+  console.log('Final profile data being used:', profileData)
 
   // Dynamic progress messages that cycle automatically
   const progressMessages = [
@@ -44,6 +59,9 @@ const AILoadingScreen = ({ userProfile = null }) => {
   useEffect(() => {
     let messageInterval
     let progressInterval
+    
+    // Reset API call ref on component mount to allow fresh generation
+    hasCalledAPI.current = false
     
     const generateJobListings = async () => {
       // Prevent multiple API calls using ref
@@ -143,7 +161,7 @@ const AILoadingScreen = ({ userProfile = null }) => {
       if (messageInterval) clearInterval(messageInterval)
       if (progressInterval) clearInterval(progressInterval)
     }
-  }, [navigate]) // Only depend on navigate
+  }, []) // Empty dependency array since we're not using any props or state
 
   return (
     <Box

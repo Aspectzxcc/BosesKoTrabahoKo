@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -25,6 +25,14 @@ const OnboardingWelcome = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Clear any existing onboarding data when component mounts
+  useEffect(() => {
+    localStorage.removeItem('bktk_onboarding_data');
+    localStorage.removeItem('bktk_job_data');
+    localStorage.removeItem('bktk_converted_jobs');
+    console.log('Cleared existing onboarding and job data for fresh start');
+  }, []);
 
   const educationLevels = [
     'High School',
@@ -103,7 +111,7 @@ const OnboardingWelcome = () => {
   const handleNext = () => {
     if (validateForm()) {
       // Store form data in localStorage or state management solution
-      localStorage.setItem('onboardingData', JSON.stringify({
+      localStorage.setItem('bktk_onboarding_data', JSON.stringify({
         welcome: formData
       }));
       

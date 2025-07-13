@@ -674,6 +674,15 @@ const ExploreJobs = () => {
             <Button
               variant="outlined"
               size="large"
+              onClick={() => {
+                // Navigate to AI loading screen to generate fresh recommendations
+                navigate('/onboarding/loading', { 
+                  state: { 
+                    userProfile: finalUserProfile,
+                    refreshMode: true 
+                  } 
+                })
+              }}
               sx={{
                 borderColor: '#2980b9',
                 color: '#2980b9',

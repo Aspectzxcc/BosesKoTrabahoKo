@@ -31,7 +31,7 @@ When analyzing the user profile, pay special attention to:
 
 ### Enhanced Instructions
 - Generate exactly 5 unique, highly relevant job positions
-- Match scores should range 75-95%, with higher scores for better profile alignment
+- Match scores should range 85-99%, with higher scores for better profile alignment
 - Each position must include SPECIFIC examples of how it matches the user's profile
 - Use the user's actual skills, interests, and goals in descriptions
 - Reference their major/course when explaining job relevance

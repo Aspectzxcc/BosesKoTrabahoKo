@@ -59,7 +59,7 @@ const OnboardingSkills = () => {
 
   const handleNext = () => {
     // Get existing onboarding data from localStorage
-    const existingData = JSON.parse(localStorage.getItem('onboardingData') || '{}')
+    const existingData = JSON.parse(localStorage.getItem('bktk_onboarding_data') || '{}')
     
     // Create skills data object
     const skillsData = {
@@ -74,7 +74,7 @@ const OnboardingSkills = () => {
       skills: skillsData
     }
     
-    localStorage.setItem('onboardingData', JSON.stringify(updatedData))
+    localStorage.setItem('bktk_onboarding_data', JSON.stringify(updatedData))
     
     // Log for debugging
     console.log('Skills Data saved:', skillsData)

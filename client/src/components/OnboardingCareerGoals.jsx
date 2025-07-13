@@ -84,7 +84,7 @@ const OnboardingCareerGoals = () => {
 
   const handleFinishSetup = () => {
     // Get existing onboarding data from localStorage
-    const existingData = JSON.parse(localStorage.getItem('onboardingData') || '{}')
+    const existingData = JSON.parse(localStorage.getItem('bktk_onboarding_data') || '{}')
     
     // Create career goals data object
     const careerGoalsData = {
@@ -99,7 +99,7 @@ const OnboardingCareerGoals = () => {
       careerGoals: careerGoalsData
     }
     
-    localStorage.setItem('onboardingData', JSON.stringify(updatedData))
+    localStorage.setItem('bktk_onboarding_data', JSON.stringify(updatedData))
     
     // Log for debugging
     console.log('Career Goals Data saved:', careerGoalsData)
