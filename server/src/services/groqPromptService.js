@@ -60,20 +60,22 @@ Return a JSON object with "job_positions" array containing 5 position objects. E
 - Include specific, actionable career development advice
 `;
 
-async function generateJobPositions(userProfile = {}) {
+async function generateJobPositions(userProfile = {}, isRefresh = false) {
     // Extract data from the new nested structure
     const welcome = userProfile.welcome || {};
     const skills = userProfile.skills || {};
     const careerGoals = userProfile.careerGoals || {};
     
-    console.log('🚀 Starting PERSONALIZED job position generation for user:', welcome.fullName || 'Anonymous');
+    const generationType = isRefresh ? 'REFRESH' : 'INITIAL';
+    console.log(`🚀 Starting ${generationType} PERSONALIZED job position generation for user:`, welcome.fullName || 'Anonymous');
     console.log('📋 User profile analysis:', {
         hasBasicInfo: !!(welcome.fullName && welcome.majorCourse),
         hardSkillsCount: skills.selectedHardSkills?.length || 0,
         softSkillsCount: skills.selectedSoftSkills?.length || 0,
         hasCareerInterests: !!userProfile.careerInterests,
         hasDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
-        workEnvironment: careerGoals.workEnvironment || userProfile.workEnvironment || 'not specified'
+        workEnvironment: careerGoals.workEnvironment || userProfile.workEnvironment || 'not specified',
+        isRefreshGeneration: isRefresh
     });
 
     try {
@@ -122,6 +124,33 @@ async function generateJobPositions(userProfile = {}) {
         
         ### PERSONALIZATION MANDATE ###
         
+        ${isRefresh ? `
+        **🔄 REFRESH MODE - GENERATE FRESH ALTERNATIVES:**
+        
+        This is a REFRESH request. The user wants to see NEW job opportunities different from their previous recommendations. 
+        
+        REFRESH REQUIREMENTS:
+        - Explore DIFFERENT industries or sectors than typical for their major
+        - Suggest ALTERNATIVE career paths they might not have considered
+        - Include MORE CREATIVE applications of their skills
+        - Consider EMERGING fields or modern job roles
+        - Introduce STARTUP or entrepreneurial opportunities
+        - Suggest CROSS-FUNCTIONAL roles that blend multiple skills
+        - Higher creativity and exploration while maintaining personalization
+        - Use slightly higher temperature in thinking (more innovative suggestions)
+        
+        Still maintain strong personalization but be MORE ADVENTUROUS and DIVERSE in recommendations.
+        ` : `
+        **🎯 INITIAL GENERATION - CORE RECOMMENDATIONS:**
+        
+        This is the user's FIRST set of recommendations. Focus on:
+        - MOST OBVIOUS career paths for their major/background
+        - TRADITIONAL entry-level positions in their field
+        - SAFEST matches for their skills and education
+        - MAINSTREAM companies and established industries
+        - CONSERVATIVE but highly relevant opportunities
+        `}
+        
         You MUST create job recommendations that:
         
         1. **LEVERAGE EXISTING SKILLS**: Use their specific hard and soft skills as primary qualifications
@@ -143,14 +172,20 @@ async function generateJobPositions(userProfile = {}) {
             skillsDetected: (skills.selectedHardSkills?.length || 0) + (skills.selectedSoftSkills?.length || 0),
             hasSpecificMajor: !!welcome.majorCourse,
             hasClearDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
-            hasPriorities: !!(careerGoals.selectedGoals?.length || userProfile.selectedGoals?.length)
+            hasPriorities: !!(careerGoals.selectedGoals?.length || userProfile.selectedGoals?.length),
+            generationMode: isRefresh ? 'REFRESH' : 'INITIAL'
         });
+        
+        // Adjust AI parameters based on refresh mode
+        const aiTemperature = isRefresh ? 0.7 : 0.3; // More creative for refresh
+        const aiTopP = isRefresh ? 0.95 : 0.9; // More diverse sampling for refresh
         
         console.log('⚙️ Enhanced AI request parameters:', {
             model: "meta-llama/llama-4-maverick-17b-128e-instruct",
-            temperature: 0.3, // Lower for more focused, consistent responses
-            max_tokens: 5120, // Increased for detailed personalization
-            response_format: "json_object"
+            temperature: aiTemperature,
+            max_tokens: 5120,
+            response_format: "json_object",
+            mode: isRefresh ? "creative_refresh" : "focused_initial"
         });
 
         const chatCompletion = await groq.chat.completions.create({
@@ -165,9 +200,9 @@ async function generateJobPositions(userProfile = {}) {
                 }
             ],
             "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
-            "temperature": 0.3, // More focused responses
-            "max_completion_tokens": 5120, // Increased token limit for detailed descriptions
-            "top_p": 0.9, // More focused sampling
+            "temperature": aiTemperature, // Dynamic based on refresh mode
+            "max_completion_tokens": 5120,
+            "top_p": aiTopP, // Dynamic sampling based on refresh mode
             "response_format": { "type": "json_object" }
         });
 
@@ -231,14 +266,17 @@ async function generateJobPositions(userProfile = {}) {
             totalPositions: jobPositions.length,
             averageMatchScore: Math.round(jobPositions.reduce((sum, pos) => sum + pos.match_score, 0) / jobPositions.length),
             industries: [...new Set(jobPositions.map(pos => pos.industry_sector))],
-            experienceLevels: [...new Set(jobPositions.map(pos => pos.experience_level))]
+            experienceLevels: [...new Set(jobPositions.map(pos => pos.experience_level))],
+            generationType: isRefresh ? 'REFRESH' : 'INITIAL'
         });
 
         return {
             success: true,
             job_positions: jobPositions,
             total_positions: jobPositions.length,
-            personalized_for: welcome.fullName || 'User'
+            personalized_for: welcome.fullName || 'User',
+            generation_type: isRefresh ? 'refresh' : 'initial',
+            is_refresh: isRefresh
         };
 
     } catch (error) {
@@ -260,7 +298,8 @@ async function generateJobPositions(userProfile = {}) {
             totalPositions: fallbackPositions.length,
             positionTitles: fallbackPositions.map(pos => pos.position_title),
             averageMatchScore: Math.round(fallbackPositions.reduce((sum, pos) => sum + pos.match_score, 0) / fallbackPositions.length),
-            basedOnMajor: !!welcome.majorCourse
+            basedOnMajor: !!welcome.majorCourse,
+            generationType: isRefresh ? 'REFRESH_FALLBACK' : 'INITIAL_FALLBACK'
         });
 
         return {
@@ -268,7 +307,9 @@ async function generateJobPositions(userProfile = {}) {
             error: error.message,
             job_positions: fallbackPositions,
             total_positions: fallbackPositions.length,
-            personalized_for: welcome.fullName || 'User'
+            personalized_for: welcome.fullName || 'User',
+            generation_type: isRefresh ? 'refresh_fallback' : 'initial_fallback',
+            is_refresh: isRefresh
         };
     }
 }

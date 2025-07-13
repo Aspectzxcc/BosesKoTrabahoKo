@@ -20,6 +20,6 @@ api.interceptors.response.use(
     }
 );
 
-export const getJobListings = (userProfile) => api.post('/jobs', { userProfile });
+export const getJobListings = (userProfile, isRefresh = false) => api.post('/jobs', { userProfile, isRefresh });
 
 export default api;

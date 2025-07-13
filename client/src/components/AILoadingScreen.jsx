@@ -32,6 +32,25 @@ const AILoadingScreen = () => {
     return null
   }
 
+  // Check if this is a refresh by looking for existing job data
+  const getIsRefreshMode = () => {
+    try {
+      const existingJobData = localStorage.getItem('bktk_job_data')
+      const existingConvertedJobs = localStorage.getItem('bktk_converted_jobs')
+      const isRefresh = !!(existingJobData || existingConvertedJobs)
+      console.log('🔄 Refresh mode detection:', {
+        hasExistingJobData: !!existingJobData,
+        hasExistingConvertedJobs: !!existingConvertedJobs,
+        isRefresh: isRefresh
+      })
+      return isRefresh
+    } catch (error) {
+      console.error('Error checking refresh mode:', error)
+      return false
+    }
+  }
+
+  const isRefreshMode = getIsRefreshMode()
   const profileData = getOnboardingData() || {
     fullName: 'User',
     majorCourse: 'General Studies',
@@ -48,7 +67,13 @@ const AILoadingScreen = () => {
   console.log('Final profile data being used:', profileData)
 
   // Dynamic progress messages that cycle automatically
-  const progressMessages = [
+  const progressMessages = isRefreshMode ? [
+    "Exploring fresh career opportunities...",
+    "Discovering alternative career paths...",
+    "Finding creative applications for your skills...",
+    "Generating innovative job recommendations...",
+    "Crafting your refreshed career roadmap..."
+  ] : [
     "Analyzing your academic background...",
     "Mapping your current skills to industry demands...",
     "Identifying potential career paths...",
@@ -93,7 +118,8 @@ const AILoadingScreen = () => {
 
         // Make the actual API call to generate job listings
         console.log('Making API call to generate job listings...');
-        const response = await getJobListings(profileData)
+        console.log('🔄 Generation mode:', isRefreshMode ? 'REFRESH' : 'INITIAL');
+        const response = await getJobListings(profileData, isRefreshMode)
         console.log('API call successful:', response);
         
         // Store job data in localStorage for persistence
@@ -362,8 +388,12 @@ const AILoadingScreen = () => {
           {error 
             ? 'Oops! Something went wrong...' 
             : isGenerating 
-              ? `Crafting your personalized career path, ${profileData.fullName}...`
-              : 'Crafting your personalized career path...'
+              ? isRefreshMode
+                ? `Discovering fresh opportunities for you, ${profileData.fullName}...`
+                : `Crafting your personalized career path, ${profileData.fullName}...`
+              : isRefreshMode
+                ? 'Discovering fresh opportunities for you...'
+                : 'Crafting your personalized career path...'
           }
         </Typography>
 
