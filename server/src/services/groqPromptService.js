@@ -63,6 +63,24 @@ Generate a list of highly relevant, AI-curated job position recommendations that
 - Focus on position characteristics rather than specific company details
 `;
 
+async function generateJobPositions(userProfile = {}) {
+    // Extract data from the new nested structure
+    const welcome = userProfile.welcome || {};
+    const skills = userProfile.skills || {};
+    const careerGoals = userProfile.careerGoals || {};
+    
+    console.log('🚀 Starting job position generation for user:', welcome.fullName || 'Anonymous');
+    console.log('📋 User profile received:', {
+        hasBasicInfo: !!(welcome.fullName && welcome.majorCourse),
+        hardSkillsCount: skills.selectedHardSkills?.length || 0,
+        softSkillsCount: skills.selectedSoftSkills?.length || 0,
+        hasCareerInterests: !!userProfile.careerInterests,
+        hasDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
+        workEnvironment: careerGoals.workEnvironment || userProfile.workEnvironment || 'not specified'
+    });
+
+    try {
+        // Create a comprehensive user context from the provided profile
         const userContext = 
         `
         ### USER PROFILE DATA ###
@@ -127,23 +145,6 @@ Generate a list of highly relevant, AI-curated job position recommendations that
             response_format: "json_object"
         });
 
-async function generateJobPositions(userProfile = {}) {
-    // Extract data from the new nested structure
-    const welcome = userProfile.welcome || {};
-    const skills = userProfile.skills || {};
-    const careerGoals = userProfile.careerGoals || {};
-    
-    console.log('🚀 Starting job position generation for user:', welcome.fullName || 'Anonymous');
-    console.log('📋 User profile received:', {
-        hasBasicInfo: !!(welcome.fullName && welcome.majorCourse),
-        hardSkillsCount: skills.selectedHardSkills?.length || 0,
-        softSkillsCount: skills.selectedSoftSkills?.length || 0,
-        hasCareerInterests: !!userProfile.careerInterests,
-        hasDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
-        workEnvironment: careerGoals.workEnvironment || userProfile.workEnvironment || 'not specified'
-    });
-
-    try {
         const chatCompletion = await groq.chat.completions.create({
             "messages": [
                 {
