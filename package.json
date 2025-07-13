@@ -4,8 +4,7 @@
   "description": "AI-powered job recommendation platform for Filipino graduates",
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
-    "init": "npm install && npm install --prefix server && npm install --prefix client",
-    "build": "npm run build --prefix client --production=false"
+    "init": "npm install && npm install --prefix server && npm install --prefix client && npm run build --prefix client --production=false"
   },
   "keywords": [
     "job-recommendation",
