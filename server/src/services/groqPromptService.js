@@ -1,5 +1,6 @@
 const { Groq } = require('groq-sdk');
 const { config } = require('../utils/config');
+const { generateFallbackPositions } = require('../utils/fallbackTemplates');
 
 const groq = new Groq({
     apiKey: config.groqApiKey,
@@ -243,43 +244,20 @@ async function generateJobPositions(userProfile = {}) {
         // Return a fallback response with sample positions tailored to basic profile info
         console.log('🔄 Generating fallback response...');
         
-        const fallbackTitle = welcome.majorCourse 
-            ? `${welcome.majorCourse} Graduate Position`
-            : 'Entry-Level Assistant';
-            
-        const fallbackSkills = skills.selectedHardSkills && skills.selectedHardSkills.length > 0
-            ? skills.selectedHardSkills.slice(0, 3)
-            : ['MS Office', 'Communication', 'Teamwork'];
-
-        console.log('📝 Fallback job created:', {
-            title: fallbackTitle,
-            skills: fallbackSkills,
+        const fallbackPositions = generateFallbackPositions(userProfile);
+        
+        console.log('📝 Fallback positions created:', {
+            totalPositions: fallbackPositions.length,
+            positionTitles: fallbackPositions.map(pos => pos.position_title),
+            averageMatchScore: Math.round(fallbackPositions.reduce((sum, pos) => sum + pos.match_score, 0) / fallbackPositions.length),
             basedOnMajor: !!welcome.majorCourse
         });
 
         return {
             success: false,
             error: error.message,
-            job_positions: [
-                {
-                    position_id: `fallback_${Date.now()}`,
-                    position_title: fallbackTitle,
-                    experience_level: 'Entry-Level',
-                    match_score: 80,
-                    position_summary: `Great starting position for ${welcome.majorCourse || 'fresh graduates'}`,
-                    role_description: 'An excellent opportunity to begin your career with a supportive team and structured learning environment.',
-                    key_responsibilities: ['Learn company processes', 'Assist with daily operations', 'Participate in training programs'],
-                    required_qualifications: [welcome.highestEducation || 'Bachelor\'s degree', 'Good communication skills'],
-                    required_skills: fallbackSkills,
-                    skill_development_opportunities: ['Professional communication', 'Industry knowledge', 'Project management'],
-                    career_growth_path: 'Opportunity to advance to specialist or supervisory roles within 2-3 years',
-                    work_environment_fit: `Suitable for ${careerGoals.workEnvironment || userProfile.workEnvironment || 'flexible'} work arrangements`,
-                    career_priorities_alignment: 'Provides learning opportunities and career growth potential',
-                    industry_sector: 'General Business',
-                    typical_salary_range: 'PHP 18,000 - 22,000 / month'
-                }
-            ],
-            total_positions: 1,
+            job_positions: fallbackPositions,
+            total_positions: fallbackPositions.length,
             personalized_for: welcome.fullName || 'User'
         };
     }

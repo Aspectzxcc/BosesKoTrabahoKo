@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Box,
   Typography,
@@ -16,6 +16,7 @@ const AILoadingScreen = ({ userProfile = null }) => {
   const [progress, setProgress] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState(null)
+  const hasCalledAPI = useRef(false) // Ref to track if API has been called
 
   // Get user profile from props, location state, or default
   const profileData = userProfile || location.state?.userProfile || {
@@ -45,6 +46,14 @@ const AILoadingScreen = ({ userProfile = null }) => {
     let progressInterval
     
     const generateJobListings = async () => {
+      // Prevent multiple API calls using ref
+      if (hasCalledAPI.current) {
+        console.log('API call already made, preventing duplicate call');
+        return;
+      }
+      
+      hasCalledAPI.current = true;
+      
       try {
         setIsGenerating(true)
         setError(null)
@@ -87,6 +96,9 @@ const AILoadingScreen = ({ userProfile = null }) => {
       } catch (error) {
         console.error('Error generating job listings:', error)
         
+        // Reset the ref on error so user can retry by refreshing/navigating back
+        hasCalledAPI.current = false;
+        
         // Provide more specific error messages
         let errorMessage = 'Failed to generate personalized job recommendations. Please try again.';
         
@@ -120,7 +132,7 @@ const AILoadingScreen = ({ userProfile = null }) => {
       if (messageInterval) clearInterval(messageInterval)
       if (progressInterval) clearInterval(progressInterval)
     }
-  }, [navigate, progressMessages.length, profileData])
+  }, [navigate]) // Only depend on navigate
 
   return (
     <Box
