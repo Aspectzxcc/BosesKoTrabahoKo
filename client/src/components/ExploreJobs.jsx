@@ -17,7 +17,15 @@ import {
   Grid,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Slider,
+  FormControlLabel,
+  Checkbox,
+  FormGroup
 } from '@mui/material'
 import {
   Search,
@@ -26,24 +34,39 @@ import {
   Schedule,
   Person,
   School,
-  BusinessCenter
+  BusinessCenter,
+  Close,
+  Clear
 } from '@mui/icons-material'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const ExploreJobs = () => {
-  const location = useLocation()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [industryFilter, setIndustryFilter] = useState('')
   const [jobType, setJobType] = useState('')
   const [filteredJobs, setFilteredJobs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  
+  // Advanced filter states
+  const [showMoreFilters, setShowMoreFilters] = useState(false)
+  const [matchScoreRange, setMatchScoreRange] = useState([70, 100])
+  const [selectedSkills, setSelectedSkills] = useState([])
+  const [workEnvironment, setWorkEnvironment] = useState('')
+  const [salaryRange, setSalaryRange] = useState('')
 
-  // Get job listings from navigation state (passed from AI Loading Screen) or localStorage
-  const apiJobListings = location.state?.jobListings || []
-  const userProfile = location.state?.userProfile || null
-  const generationSuccess = location.state?.generationSuccess || false
-  const totalPositions = location.state?.totalPositions || 0
+  // Get user profile from localStorage
+  const getUserProfile = () => {
+    try {
+      const storedData = localStorage.getItem('bktk_onboarding_data')
+      if (storedData) {
+        return JSON.parse(storedData)
+      }
+    } catch (error) {
+      console.error('Error retrieving user profile from localStorage:', error)
+    }
+    return null
+  }
 
   // Function to get job data from localStorage
   const getJobDataFromStorage = () => {
@@ -68,12 +91,13 @@ const ExploreJobs = () => {
     }
   }
 
-  // Get stored job data if not available in navigation state
-  const storedJobData = !apiJobListings.length ? getJobDataFromStorage() : null
-  const finalJobListings = apiJobListings.length > 0 ? apiJobListings : (storedJobData?.jobListings || [])
-  const finalUserProfile = userProfile || storedJobData?.userProfile || null
-  const finalGenerationSuccess = generationSuccess || storedJobData?.generationSuccess || false
-  const finalTotalPositions = totalPositions || storedJobData?.totalPositions || 0
+  // Get all data from localStorage
+  const storedJobData = getJobDataFromStorage()
+  const userProfile = getUserProfile()
+  const finalJobListings = storedJobData?.jobListings || []
+  const finalGenerationSuccess = storedJobData?.generationSuccess || false
+  const finalTotalPositions = storedJobData?.totalPositions || 0
+  const generationType = storedJobData?.generation_type || 'initial'
 
   // Fallback sample data for development/error scenarios
   const fallbackJobData = [
@@ -221,21 +245,93 @@ const ExploreJobs = () => {
       )
     }
 
+    // Apply match score range filter
+    filtered = filtered.filter(job => 
+      job.matchScore >= matchScoreRange[0] && job.matchScore <= matchScoreRange[1]
+    )
+
+    // Apply skills filter
+    if (selectedSkills.length > 0) {
+      filtered = filtered.filter(job =>
+        selectedSkills.some(skill => 
+          job.skills.some(jobSkill => 
+            jobSkill.toLowerCase().includes(skill.toLowerCase())
+          )
+        )
+      )
+    }
+
+    // Apply work environment filter
+    if (workEnvironment) {
+      filtered = filtered.filter(job =>
+        job.workEnvironmentFit && job.workEnvironmentFit.toLowerCase().includes(workEnvironment.toLowerCase())
+      )
+    }
+
+    // Apply salary range filter
+    if (salaryRange) {
+      filtered = filtered.filter(job => {
+        if (!job.originalData?.typical_salary_range) return true
+        const salaryText = job.originalData.typical_salary_range.toLowerCase()
+        switch (salaryRange) {
+          case 'entry':
+            return salaryText.includes('15,000') || salaryText.includes('18,000') || salaryText.includes('20,000')
+          case 'junior':
+            return salaryText.includes('25,000') || salaryText.includes('30,000') || salaryText.includes('35,000')
+          case 'mid':
+            return salaryText.includes('40,000') || salaryText.includes('45,000') || salaryText.includes('50,000')
+          default:
+            return true
+        }
+      })
+    }
+
     // Sort filtered results by match score in descending order (highest match first)
     const sortedFiltered = filtered.sort((a, b) => b.matchScore - a.matchScore)
 
     setFilteredJobs(sortedFiltered)
-  }, [searchQuery, industryFilter, jobType, convertedJobs])
+  }, [searchQuery, industryFilter, jobType, convertedJobs, matchScoreRange, selectedSkills, workEnvironment, salaryRange])
 
   const handleViewDetails = (job) => {
     // Navigate to job detail page with job data
     navigate('/job-detail', { 
       state: { 
         job,
-        userProfile: finalUserProfile,
+        userProfile: userProfile,
         fromExploreJobs: true 
       } 
     })
+  }
+
+  // Get all available skills from converted jobs for filter options
+  const getAllSkills = () => {
+    const allSkills = new Set()
+    convertedJobs.forEach(job => {
+      if (job.skills) {
+        job.skills.forEach(skill => allSkills.add(skill))
+      }
+    })
+    return Array.from(allSkills).sort()
+  }
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery('')
+    setIndustryFilter('')
+    setJobType('')
+    setMatchScoreRange([70, 100])
+    setSelectedSkills([])
+    setWorkEnvironment('')
+    setSalaryRange('')
+  }
+
+  // Handle skill selection
+  const handleSkillToggle = (skill) => {
+    setSelectedSkills(prev => 
+      prev.includes(skill) 
+        ? prev.filter(s => s !== skill)
+        : [...prev, skill]
+    )
   }
 
   const getMatchScoreColor = (score) => {
@@ -438,7 +534,7 @@ const ExploreJobs = () => {
             }}
           >
             {finalJobListings.length > 0 
-              ? `Discover ${finalTotalPositions} AI-curated roles tailored to your skills and aspirations${finalUserProfile?.welcome?.fullName ? `, ${finalUserProfile.welcome.fullName}` : ''}`
+              ? `Discover ${finalTotalPositions} AI-curated ${generationType === 'refresh' ? 'refreshed' : ''} roles tailored to your skills and aspirations${userProfile?.welcome?.fullName ? `, ${userProfile.welcome.fullName}` : ''}`
               : 'Discover roles tailored to your skills and aspirations'
             }
           </Typography>
@@ -450,7 +546,7 @@ const ExploreJobs = () => {
               sx={{ mb: 2, borderRadius: '8px' }}
             >
               {finalGenerationSuccess 
-                ? `✨ Successfully generated ${finalTotalPositions} personalized job recommendations based on your profile!`
+                ? `✨ Successfully generated ${finalTotalPositions} ${generationType === 'refresh' ? 'fresh' : 'personalized'} job recommendations based on your profile!`
                 : "⚡ Showing personalized recommendations - some positions generated with fallback data."
               }
             </Alert>
@@ -563,6 +659,7 @@ const ExploreJobs = () => {
                   variant="contained"
                   fullWidth
                   startIcon={<FilterList />}
+                  onClick={() => setShowMoreFilters(true)}
                   sx={{
                     backgroundColor: '#2980b9',
                     color: 'white',
@@ -583,6 +680,58 @@ const ExploreJobs = () => {
                 </Button>
               </Grid>
             </Grid>
+
+            {/* Active Filters Display */}
+            {(selectedSkills.length > 0 || workEnvironment || salaryRange || matchScoreRange[0] > 70 || matchScoreRange[1] < 100) && (
+              <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #ecf0f1' }}>
+                <Typography variant="body2" sx={{ color: '#7f8c8d', mb: 1 }}>
+                  Active Filters:
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {selectedSkills.map(skill => (
+                    <Chip
+                      key={skill}
+                      label={skill}
+                      onDelete={() => handleSkillToggle(skill)}
+                      size="small"
+                      sx={{ backgroundColor: '#e6f2fa', color: '#2980b9' }}
+                    />
+                  ))}
+                  {workEnvironment && (
+                    <Chip
+                      label={`Work: ${workEnvironment}`}
+                      onDelete={() => setWorkEnvironment('')}
+                      size="small"
+                      sx={{ backgroundColor: '#e6f2fa', color: '#2980b9' }}
+                    />
+                  )}
+                  {salaryRange && (
+                    <Chip
+                      label={`Salary: ${salaryRange}`}
+                      onDelete={() => setSalaryRange('')}
+                      size="small"
+                      sx={{ backgroundColor: '#e6f2fa', color: '#2980b9' }}
+                    />
+                  )}
+                  {(matchScoreRange[0] > 70 || matchScoreRange[1] < 100) && (
+                    <Chip
+                      label={`Match: ${matchScoreRange[0]}-${matchScoreRange[1]}%`}
+                      onDelete={() => setMatchScoreRange([70, 100])}
+                      size="small"
+                      sx={{ backgroundColor: '#e6f2fa', color: '#2980b9' }}
+                    />
+                  )}
+                  <Button
+                    size="small"
+                    onClick={clearAllFilters}
+                    startIcon={<Clear />}
+                    sx={{ ml: 1, color: '#7f8c8d', fontSize: '0.75rem' }}
+                  >
+                    Clear All
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </CardContent>
         </Card>
 
@@ -668,6 +817,125 @@ const ExploreJobs = () => {
           )}
         </Box>
 
+        {/* More Filters Dialog */}
+        <Dialog
+          open={showMoreFilters}
+          onClose={() => setShowMoreFilters(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ color: '#2c3e50', fontWeight: 600 }}>
+              Advanced Filters
+            </Typography>
+            <IconButton onClick={() => setShowMoreFilters(false)}>
+              <Close />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <Box sx={{ py: 2 }}>
+              {/* Match Score Range */}
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="subtitle1" sx={{ mb: 2, color: '#2c3e50', fontWeight: 600 }}>
+                  Match Score Range
+                </Typography>
+                <Slider
+                  value={matchScoreRange}
+                  onChange={(e, newValue) => setMatchScoreRange(newValue)}
+                  valueLabelDisplay="auto"
+                  min={50}
+                  max={100}
+                  marks={[
+                    { value: 50, label: '50%' },
+                    { value: 70, label: '70%' },
+                    { value: 85, label: '85%' },
+                    { value: 100, label: '100%' }
+                  ]}
+                  sx={{ color: '#2980b9' }}
+                />
+              </Box>
+
+              {/* Skills Filter */}
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="subtitle1" sx={{ mb: 2, color: '#2c3e50', fontWeight: 600 }}>
+                  Required Skills
+                </Typography>
+                <Box sx={{ maxHeight: 200, overflow: 'auto', border: '1px solid #ecf0f1', borderRadius: '8px', p: 2 }}>
+                  <FormGroup>
+                    {getAllSkills().map(skill => (
+                      <FormControlLabel
+                        key={skill}
+                        control={
+                          <Checkbox
+                            checked={selectedSkills.includes(skill)}
+                            onChange={() => handleSkillToggle(skill)}
+                            sx={{ color: '#2980b9' }}
+                          />
+                        }
+                        label={skill}
+                        sx={{ mb: 0.5 }}
+                      />
+                    ))}
+                  </FormGroup>
+                </Box>
+              </Box>
+
+              {/* Work Environment */}
+              <Box sx={{ mb: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Work Environment</InputLabel>
+                  <Select
+                    value={workEnvironment}
+                    onChange={(e) => setWorkEnvironment(e.target.value)}
+                    sx={{ borderRadius: '8px' }}
+                  >
+                    <MenuItem value="">All Environments</MenuItem>
+                    <MenuItem value="remote">Remote Work</MenuItem>
+                    <MenuItem value="hybrid">Hybrid</MenuItem>
+                    <MenuItem value="office">In-Office</MenuItem>
+                    <MenuItem value="flexible">Flexible</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {/* Salary Range */}
+              <Box sx={{ mb: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Salary Range</InputLabel>
+                  <Select
+                    value={salaryRange}
+                    onChange={(e) => setSalaryRange(e.target.value)}
+                    sx={{ borderRadius: '8px' }}
+                  >
+                    <MenuItem value="">All Salary Ranges</MenuItem>
+                    <MenuItem value="entry">Entry Level (₱15,000 - ₱25,000)</MenuItem>
+                    <MenuItem value="junior">Junior Level (₱25,000 - ₱40,000)</MenuItem>
+                    <MenuItem value="mid">Mid Level (₱40,000 - ₱60,000)</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3 }}>
+            <Button
+              onClick={clearAllFilters}
+              sx={{ color: '#7f8c8d' }}
+            >
+              Clear All Filters
+            </Button>
+            <Button
+              onClick={() => setShowMoreFilters(false)}
+              variant="contained"
+              sx={{
+                backgroundColor: '#2980b9',
+                '&:hover': { backgroundColor: '#1e6091' }
+              }}
+            >
+              Apply Filters
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         {/* Load More Button - Only show if there are results and not all positions are shown */}
         {filteredJobs.length > 0 && filteredJobs.length >= 4 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -676,12 +944,7 @@ const ExploreJobs = () => {
               size="large"
               onClick={() => {
                 // Navigate to AI loading screen to generate fresh recommendations
-                navigate('/onboarding/loading', { 
-                  state: { 
-                    userProfile: finalUserProfile,
-                    refreshMode: true 
-                  } 
-                })
+                navigate('/onboarding/loading')
               }}
               sx={{
                 borderColor: '#2980b9',
