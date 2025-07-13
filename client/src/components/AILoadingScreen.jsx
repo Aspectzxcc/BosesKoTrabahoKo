@@ -78,6 +78,17 @@ const AILoadingScreen = ({ userProfile = null }) => {
         const response = await getJobListings(profileData)
         console.log('API call successful:', response);
         
+        // Store job data in localStorage for persistence
+        const jobData = {
+          jobListings: response.job_positions,
+          userProfile: profileData,
+          generationSuccess: response.success,
+          totalPositions: response.total_positions,
+          timestamp: Date.now() // Add timestamp for cache management
+        }
+        localStorage.setItem('bktk_job_data', JSON.stringify(jobData))
+        console.log('Job data stored in localStorage:', jobData);
+        
         // Complete the progress
         setProgress(100)
         
