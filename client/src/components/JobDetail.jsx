@@ -122,7 +122,7 @@ const JobDetail = () => {
             🎯 Skills Alignment
           </Typography>
           <Typography variant="body2" sx={{ color: '#7f8c8d', mb: 2 }}>
-            {job.skills && job.skills.length > 0 
+            {job.skills && Array.isArray(job.skills) && job.skills.length > 0 
               ? `This position type typically requires skills like ${job.skills.slice(0, 3).join(', ')}, which align well with your background.`
               : 'This position type offers great opportunities to apply and develop your existing skills.'
             }
@@ -406,7 +406,7 @@ const JobDetail = () => {
               </Card>
 
               {/* Key Responsibilities */}
-              {job.keyResponsibilities && job.keyResponsibilities.length > 0 && (
+              {job.keyResponsibilities && Array.isArray(job.keyResponsibilities) && job.keyResponsibilities.length > 0 && (
                 <Card
                   sx={{
                     borderRadius: '12px',
@@ -442,8 +442,8 @@ const JobDetail = () => {
                       </ListItem>
                     ))}
                   </List>
-                  </CardContent>
-                </Card>
+                </CardContent>
+              </Card>
               )}
 
               {/* What We're Looking For */}
@@ -467,7 +467,7 @@ const JobDetail = () => {
                   </Typography>
                   
                   {/* Qualifications */}
-                  {job.requiredQualifications && job.requiredQualifications.length > 0 && (
+                  {job.requiredQualifications && Array.isArray(job.requiredQualifications) && job.requiredQualifications.length > 0 && (
                     <Box sx={{ mb: 3 }}>
                       <Typography
                         variant="subtitle1"
@@ -501,7 +501,7 @@ const JobDetail = () => {
                   )}
 
                   {/* Required Skills */}
-                  {job.skills && job.skills.length > 0 && (
+                  {job.skills && Array.isArray(job.skills) && job.skills.length > 0 && (
                     <Box>
                       <Typography
                         variant="subtitle1"
@@ -532,7 +532,7 @@ const JobDetail = () => {
               </Card>
 
               {/* Skill Development & Growth */}
-              {job.skillDevelopment && job.skillDevelopment.length > 0 && (
+              {job.skillDevelopment && Array.isArray(job.skillDevelopment) && job.skillDevelopment.length > 0 && (
                 <Card
                   sx={{
                     borderRadius: '12px',

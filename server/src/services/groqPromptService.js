@@ -8,59 +8,56 @@ const groq = new Groq({
 
 const jobListerPrompt = `
 ### Role
-You are an expert AI career advisor for "Boses Ko Trabaho Ko," specializing in identifying and recommending personalized job positions for undergraduate students and recent graduates based on their comprehensive profile data.
+You are an expert AI career advisor for "Boses Ko Trabaho Ko," specializing in creating HIGHLY PERSONALIZED job position recommendations for Filipino undergraduate students and recent graduates. Your expertise lies in matching specific user profiles to realistic, achievable career opportunities in the Philippines job market.
 
-### Context
-You are tasked with generating realistic, highly-personalized job position recommendations that align with a specific user's academic background, skills, career interests, and aspirations. The user has completed a detailed onboarding process providing information about their education, current skills (both hard and soft), career interests, dream job, work environment preferences, and career priorities.
+### Critical Mission
+Generate job recommendations that feel like they were handpicked by a human career counselor who knows the user personally. Each position must demonstrate clear, logical connections to the user's specific skills, interests, education, and career goals.
 
-### User Profile Structure
-The user profile contains the following information:
-- **Basic Info**: fullName, majorCourse, highestEducation, graduationYear
-- **Hard Skills**: Array of technical/specific skills (e.g., "Microsoft Office", "Social Media Management", "Content Writing", "Data Entry", "Customer Service", "Basic Accounting", "Project Management", "Graphic Design", "Video Editing", "Web Development", "Digital Marketing", "Photography", "Public Speaking", "Research", "Translation")
-- **Soft Skills**: Array of interpersonal skills (e.g., "Communication", "Teamwork", "Leadership", "Problem Solving", "Time Management", "Adaptability", "Critical Thinking", "Creativity", "Organization", "Attention to Detail", "Multitasking", "Initiative", "Empathy", "Negotiation", "Conflict Resolution", "Mentoring")
-- **Career Interests**: Free-text description of areas/industries that interest them (e.g., "Technology, Marketing, Healthcare")
-- **Dream Job**: Their aspirational career goal (e.g., "Software Engineer at Google", "Marketing Manager")
-- **Work Environment**: Preference for "Remote", "In-office", "Hybrid", or "Flexible"
-- **Career Priorities**: Array of selected goals (e.g., "high-salary", "work-life-balance", "career-growth", "job-security", "meaningful-work", "creative-freedom", "team-collaboration", "learning-opportunities")
+### User Profile Structure Analysis
+When analyzing the user profile, pay special attention to:
+- **Academic Background**: Major/course directly influences suitable industries and roles
+- **Skill Portfolio**: Match hard skills to job requirements, soft skills to company culture fit  
+- **Career Aspirations**: Dream job indicates long-term direction and motivation
+- **Personal Values**: Career priorities reveal what matters most to the individual
+- **Work Style**: Environment preferences affect job satisfaction and performance
 
-### Task
-Generate a list of highly relevant, AI-curated job position recommendations that are specifically tailored to the user's profile. Each position should align with their skills, interests, education level, and career aspirations while being appropriate for their experience level.
+### Personalization Requirements (MANDATORY)
+1. **Direct Skill Utilization**: At least 60% of required skills must match user's existing skills
+2. **Educational Relevance**: Positions must logically connect to their major/course of study
+3. **Career Path Alignment**: Each role must be a stepping stone toward their stated dream job
+4. **Priority Matching**: Job characteristics must align with their top 3 career priorities
+5. **Cultural Fit**: Work environment must match their stated preferences
+6. **Growth Trajectory**: Clear advancement path that builds toward their aspirations
 
-### Personalization Requirements
-- Prioritize positions that match the user's stated career interests and dream job direction
-- Include positions that utilize their existing hard and soft skills
-- Consider their work environment preferences and career priorities
-- Ensure experience requirements match their education level and graduation timeline
-- Factor in their major/course when relevant to the position
+### Enhanced Instructions
+- Generate exactly 5 unique, highly relevant job positions
+- Match scores should range 75-95%, with higher scores for better profile alignment
+- Each position must include SPECIFIC examples of how it matches the user's profile
+- Use the user's actual skills, interests, and goals in descriptions
+- Reference their major/course when explaining job relevance
+- Include realistic Philippine market salary ranges
+- Focus on entry-level positions with clear growth potential
 
-### Instructions
-- The output must be a JSON object with a single root key: "job_positions".
-- The value of "job_positions" must be a JSON array.
-- This array must contain between 3-5 JSON objects, each representing a unique job position recommendation.
-- Each position object must contain the following keys and appropriate values:
-  - "position_id": A unique string identifier for the position (e.g., "pos_2024_001").
-  - "position_title": The full title of the job position, aligned with user's interests and skill level.
-  - "experience_level": Required experience level matching their profile ("Entry-Level", "No Experience Required", "Internship", "Fresh Graduate").
-  - "match_score": An integer percentage (70-95) indicating relevance to the specific user profile.
-  - "position_summary": A concise, compelling overview that highlights why this position suits the user.
-  - "role_description": A detailed paragraph describing the role and its appeal to this specific user.
-  - "key_responsibilities": Array of primary responsibilities that align with user's skills and interests.
-  - "required_qualifications": Array of educational and experience requirements that match the user's background.
-  - "required_skills": Array of skills prioritizing those the user already possesses, with some growth opportunities.
-  - "skill_development_opportunities": Array of skills the user can develop and learn in this position.
-  - "career_growth_path": Description of potential advancement opportunities from this position.
-  - "work_environment_fit": How this position aligns with their work environment preferences.
-  - "career_priorities_alignment": How this position matches their stated career priorities and values.
-  - "industry_sector": The industry or sector this position belongs to.
-  - "typical_salary_range": Appropriate compensation range for entry-level in the Philippines job market.
+### Output Format Requirements
+Return a JSON object with "job_positions" array containing 5 position objects. Each position must have:
+- position_id, position_title, experience_level, match_score
+- position_summary (explain WHY this specific user would excel)
+- role_description (connect to their background and goals)
+- key_responsibilities (utilize their existing skills)
+- required_qualifications (match their education level)
+- required_skills (primarily skills they already have)
+- skill_development_opportunities (growth areas)
+- career_growth_path (progression toward dream job)
+- work_environment_fit (match their preferences)
+- career_priorities_alignment (address their stated values)
+- industry_sector, typical_salary_range
 
-### Constraints
-- Generate 3-5 distinct position recommendations that offer variety while staying relevant to the user
-- Match scores should reflect actual alignment with user profile (higher scores for better matches)
-- Ensure positions are realistic for the Philippine job market and entry-level candidates
-- Include a mix of industries if user has diverse interests, or focus on specific area if clearly defined
-- Response must be valid JSON only, no additional text or markdown
-- Focus on position characteristics rather than specific company details
+### Quality Standards
+- Each recommendation must feel personally crafted
+- Avoid generic descriptions or one-size-fits-all language
+- Demonstrate clear understanding of the user's unique profile
+- Show logical progression from current state to dream job
+- Include specific, actionable career development advice
 `;
 
 async function generateJobPositions(userProfile = {}) {
@@ -69,8 +66,8 @@ async function generateJobPositions(userProfile = {}) {
     const skills = userProfile.skills || {};
     const careerGoals = userProfile.careerGoals || {};
     
-    console.log('🚀 Starting job position generation for user:', welcome.fullName || 'Anonymous');
-    console.log('📋 User profile received:', {
+    console.log('🚀 Starting PERSONALIZED job position generation for user:', welcome.fullName || 'Anonymous');
+    console.log('📋 User profile analysis:', {
         hasBasicInfo: !!(welcome.fullName && welcome.majorCourse),
         hardSkillsCount: skills.selectedHardSkills?.length || 0,
         softSkillsCount: skills.selectedSoftSkills?.length || 0,
@@ -83,65 +80,76 @@ async function generateJobPositions(userProfile = {}) {
         // Create a comprehensive user context from the provided profile
         const userContext = 
         `
-        ### USER PROFILE DATA ###
+        ### DETAILED USER PROFILE FOR PERSONALIZED MATCHING ###
         
-        **Basic Information:**
-        - Full Name: ${welcome.fullName || 'Not provided'}
-        - Major/Course: ${welcome.majorCourse || 'General studies'}
-        - Highest Education: ${welcome.highestEducation || 'Undergraduate'}
-        - Graduation Year: ${welcome.graduationYear || 'Recent graduate'}
+        **PERSONAL & ACADEMIC FOUNDATION:**
+        - Name: ${welcome.fullName || 'Not provided'}
+        - Academic Major: ${welcome.majorCourse || 'General studies'} 
+        - Education Level: ${welcome.highestEducation || 'Undergraduate'}
+        - Graduation Timeline: ${welcome.graduationYear || 'Recent graduate'}
         
-        **Technical & Hard Skills:**
+        **TECHNICAL COMPETENCIES (Hard Skills):**
         ${skills.selectedHardSkills && skills.selectedHardSkills.length > 0 
-            ? skills.selectedHardSkills.map(skill => `- ${skill}`).join('\n')
-            : '- Basic computer skills\n- Communication\n- Willingness to learn'
+            ? skills.selectedHardSkills.map(skill => `✓ ${skill} (EXISTING STRENGTH)`).join('\n')
+            : '✓ Basic computer literacy\n✓ Communication\n✓ Willingness to learn'
         }
         
-        **Soft Skills & Personal Qualities:**
+        **PERSONAL STRENGTHS (Soft Skills):**
         ${skills.selectedSoftSkills && skills.selectedSoftSkills.length > 0
-            ? skills.selectedSoftSkills.map(skill => `- ${skill}`).join('\n')
-            : '- Communication\n- Teamwork\n- Adaptability'
+            ? skills.selectedSoftSkills.map(skill => `✓ ${skill} (DEMONSTRATED ABILITY)`).join('\n')
+            : '✓ Communication\n✓ Teamwork\n✓ Adaptability'
         }
         
-        **Career Interests & Industries:**
-        ${userProfile.careerInterests || 'Open to various opportunities in different industries'}
+        **CAREER PASSION & INTERESTS:**
+        ${userProfile.careerInterests || 'Exploring diverse career opportunities across multiple industries'}
         
-        **Dream Job/Career Aspiration:**
-        ${careerGoals.dreamJob || userProfile.dreamJob || 'Seeking entry-level opportunities to build career foundation'}
+        **ULTIMATE CAREER ASPIRATION:**
+        ${careerGoals.dreamJob || userProfile.dreamJob || 'Building a successful career foundation in entry-level opportunities'}
         
-        **Work Environment Preference:**
+        **PREFERRED WORK SETUP:**
         ${careerGoals.workEnvironment || userProfile.workEnvironment || 'Flexible work arrangements'}
         
-        **Career Priorities & Values:**
+        **TOP CAREER VALUES & PRIORITIES:**
         ${careerGoals.selectedGoals && careerGoals.selectedGoals.length > 0
-            ? careerGoals.selectedGoals.map(priority => `- ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`).join('\n')
+            ? careerGoals.selectedGoals.map(priority => `🎯 ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} (HIGH PRIORITY)`).join('\n')
             : userProfile.selectedGoals && userProfile.selectedGoals.length > 0
-                ? userProfile.selectedGoals.map(priority => `- ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`).join('\n')
-                : '- Learning opportunities\n- Career growth\n- Work-life balance'
+                ? userProfile.selectedGoals.map(priority => `🎯 ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} (HIGH PRIORITY)`).join('\n')
+                : '🎯 Learning Opportunities (HIGH PRIORITY)\n🎯 Career Growth (HIGH PRIORITY)\n🎯 Work-Life Balance (HIGH PRIORITY)'
         }
         
-        **Location Preference:**
-        Philippines (flexible location)
+        **GEOGRAPHIC CONTEXT:**
+        Philippines job market
         
-        ### PERSONALIZATION INSTRUCTIONS ###
-        Based on this comprehensive profile, generate position recommendations that:
-        1. Align with their stated career interests and dream job direction
-        2. Utilize their existing hard and soft skills while offering growth opportunities
-        3. Match their work environment preferences and career priorities
-        4. Are appropriate for their education level and experience
-        5. Consider their major/course background when relevant
-        6. Provide realistic opportunities in the Philippine job market
-        7. Focus on position characteristics, responsibilities, and growth potential
+        ### PERSONALIZATION MANDATE ###
         
-        Generate highly personalized, relevant job position recommendations for this specific user.
+        You MUST create job recommendations that:
+        
+        1. **LEVERAGE EXISTING SKILLS**: Use their specific hard and soft skills as primary qualifications
+        2. **CONNECT TO EDUCATION**: Show clear relationship between their major/course and the role
+        3. **ALIGN WITH ASPIRATIONS**: Each position should be a logical step toward their dream job
+        4. **HONOR THEIR VALUES**: Address their specific career priorities and work environment preferences  
+        5. **SHOW GROWTH PATH**: Demonstrate how this role leads to career advancement
+        6. **BE REALISTIC**: Appropriate for their experience level in Philippine job market
+        
+        **CRITICAL**: Reference their actual skills, major, and goals in job descriptions. Make it obvious why THIS specific user is perfect for each role.
+        
+        Generate 5 highly personalized job recommendations that feel hand-selected for this individual.
         `
         .trim();
 
-        console.log('🤖 Sending request to Groq AI with user context length:', userContext.length);
-        console.log('⚙️ AI request parameters:', {
+        console.log('🤖 Sending ENHANCED personalization request to Groq AI');
+        console.log('📊 User context analysis:', {
+            contextLength: userContext.length,
+            skillsDetected: (skills.selectedHardSkills?.length || 0) + (skills.selectedSoftSkills?.length || 0),
+            hasSpecificMajor: !!welcome.majorCourse,
+            hasClearDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
+            hasPriorities: !!(careerGoals.selectedGoals?.length || userProfile.selectedGoals?.length)
+        });
+        
+        console.log('⚙️ Enhanced AI request parameters:', {
             model: "llama-3.1-8b-instant",
-            temperature: 0.4,
-            max_tokens: 4096,
+            temperature: 0.3, // Lower for more focused, consistent responses
+            max_tokens: 5120, // Increased for detailed personalization
             response_format: "json_object"
         });
 
@@ -157,9 +165,9 @@ async function generateJobPositions(userProfile = {}) {
                 }
             ],
             "model": "llama-3.1-8b-instant",
-            "temperature": 0.4,
-            "max_tokens": 4096,
-            "top_p": 1,
+            "temperature": 0.3, // More focused responses
+            "max_completion_tokens": 5120, // Increased token limit for detailed descriptions
+            "top_p": 0.9, // More focused sampling
             "response_format": { "type": "json_object" }
         });
 
@@ -197,7 +205,7 @@ async function generateJobPositions(userProfile = {}) {
             console.log(`🔧 Processing position ${index + 1}: ${position.position_title || 'Unknown Title'}`);
             
             // Ensure required fields exist with intelligent fallbacks based on user profile
-            return {
+            const processedPosition = {
                 position_id: position.position_id || `pos_${Date.now()}_${index}`,
                 position_title: position.position_title || 'Entry-Level Position',
                 experience_level: position.experience_level || 'Entry-Level',
@@ -214,6 +222,8 @@ async function generateJobPositions(userProfile = {}) {
                 industry_sector: position.industry_sector || 'General Business',
                 typical_salary_range: position.typical_salary_range || 'PHP 18,000 - 25,000 / month'
             };
+
+            return processedPosition;
         });
 
         console.log('✨ Successfully processed all job positions');
