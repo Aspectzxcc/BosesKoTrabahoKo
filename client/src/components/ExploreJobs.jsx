@@ -266,6 +266,7 @@ const ExploreJobs = () => {
             <Typography
               variant="h6"
               component="h3"
+              onClick={() => handleViewDetails(job)}
               sx={{
                 color: '#2c3e50',
                 fontWeight: 600,

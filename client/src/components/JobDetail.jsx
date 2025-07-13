@@ -109,7 +109,7 @@ const JobDetail = () => {
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{ color: '#2c3e50', mb: 2 }}>
+        <Typography variant="h6" sx={{ color: '#2c3e50', mb: 2, mt: 2 }}>
           Why This Position Matches You ({job.matchScore}% Match)
         </Typography>
         
@@ -205,6 +205,7 @@ const JobDetail = () => {
     <Box
       sx={{
         minHeight: '100vh',
+        minWidth: '100vw',
         backgroundColor: '#e6f2fa',
         py: 4
       }}
@@ -212,10 +213,7 @@ const JobDetail = () => {
       <Container 
         maxWidth="lg"
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center'
+          mx: 'auto'
         }}
       >
         {/* Back Navigation */}
@@ -261,20 +259,23 @@ const JobDetail = () => {
           container 
           spacing={4}
           sx={{
-            justifyContent: 'center',
             maxWidth: '1200px',
-            width: '100%'
+            width: '100%',
+            mx: 'auto',
+            justifyContent: 'center'
           }}
         >
           {/* Left Column - Position Summary & Actions */}
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
             <Card
               sx={{
                 borderRadius: '12px',
                 backgroundColor: 'white',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
                 position: 'sticky',
-                top: 24
+                top: 24,
+                width: '100%',
+                maxWidth: '350px'
               }}
             >
               <CardContent sx={{ p: 3 }}>
