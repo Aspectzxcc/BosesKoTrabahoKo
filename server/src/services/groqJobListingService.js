@@ -1,5 +1,5 @@
 const { Groq } = require('groq-sdk');
-const { config } = require('../utils/config/index');
+const { config } = require('../utils/config');
 
 const groq = new Groq({
     apiKey: config.groqApiKey,
@@ -63,6 +63,21 @@ Generate a list of highly relevant, AI-curated job position recommendations that
 `;
 
 async function generateJobPositions(userProfile = {}) {
+    // Extract data from the new nested structure
+    const welcome = userProfile.welcome || {};
+    const skills = userProfile.skills || {};
+    const careerGoals = userProfile.careerGoals || {};
+    
+    console.log('🚀 Starting job position generation for user:', welcome.fullName || 'Anonymous');
+    console.log('📋 User profile received:', {
+        hasBasicInfo: !!(welcome.fullName && welcome.majorCourse),
+        hardSkillsCount: skills.selectedHardSkills?.length || 0,
+        softSkillsCount: skills.selectedSoftSkills?.length || 0,
+        hasCareerInterests: !!userProfile.careerInterests,
+        hasDreamJob: !!(careerGoals.dreamJob || userProfile.dreamJob),
+        workEnvironment: careerGoals.workEnvironment || userProfile.workEnvironment || 'not specified'
+    });
+
     try {
         // Create a comprehensive user context from the provided profile
         const userContext = 
@@ -70,20 +85,20 @@ async function generateJobPositions(userProfile = {}) {
         ### USER PROFILE DATA ###
         
         **Basic Information:**
-        - Full Name: ${userProfile.fullName || 'Not provided'}
-        - Major/Course: ${userProfile.majorCourse || 'General studies'}
-        - Highest Education: ${userProfile.highestEducation || 'Undergraduate'}
-        - Graduation Year: ${userProfile.graduationYear || 'Recent graduate'}
+        - Full Name: ${welcome.fullName || 'Not provided'}
+        - Major/Course: ${welcome.majorCourse || 'General studies'}
+        - Highest Education: ${welcome.highestEducation || 'Undergraduate'}
+        - Graduation Year: ${welcome.graduationYear || 'Recent graduate'}
         
         **Technical & Hard Skills:**
-        ${userProfile.hardSkills && userProfile.hardSkills.length > 0 
-            ? userProfile.hardSkills.map(skill => `- ${skill}`).join('\n')
+        ${skills.selectedHardSkills && skills.selectedHardSkills.length > 0 
+            ? skills.selectedHardSkills.map(skill => `- ${skill}`).join('\n')
             : '- Basic computer skills\n- Communication\n- Willingness to learn'
         }
         
         **Soft Skills & Personal Qualities:**
-        ${userProfile.softSkills && userProfile.softSkills.length > 0
-            ? userProfile.softSkills.map(skill => `- ${skill}`).join('\n')
+        ${skills.selectedSoftSkills && skills.selectedSoftSkills.length > 0
+            ? skills.selectedSoftSkills.map(skill => `- ${skill}`).join('\n')
             : '- Communication\n- Teamwork\n- Adaptability'
         }
         
@@ -91,19 +106,21 @@ async function generateJobPositions(userProfile = {}) {
         ${userProfile.careerInterests || 'Open to various opportunities in different industries'}
         
         **Dream Job/Career Aspiration:**
-        ${userProfile.dreamJob || 'Seeking entry-level opportunities to build career foundation'}
+        ${careerGoals.dreamJob || userProfile.dreamJob || 'Seeking entry-level opportunities to build career foundation'}
         
         **Work Environment Preference:**
-        ${userProfile.workEnvironment || 'Flexible work arrangements'}
+        ${careerGoals.workEnvironment || userProfile.workEnvironment || 'Flexible work arrangements'}
         
         **Career Priorities & Values:**
-        ${userProfile.careerPriorities && userProfile.careerPriorities.length > 0
-            ? userProfile.careerPriorities.map(priority => `- ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`).join('\n')
-            : '- Learning opportunities\n- Career growth\n- Work-life balance'
+        ${careerGoals.selectedGoals && careerGoals.selectedGoals.length > 0
+            ? careerGoals.selectedGoals.map(priority => `- ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`).join('\n')
+            : userProfile.selectedGoals && userProfile.selectedGoals.length > 0
+                ? userProfile.selectedGoals.map(priority => `- ${priority.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`).join('\n')
+                : '- Learning opportunities\n- Career growth\n- Work-life balance'
         }
         
         **Location Preference:**
-        ${userProfile.location || 'Philippines (flexible location)'}
+        Philippines (flexible location)
         
         ### PERSONALIZATION INSTRUCTIONS ###
         Based on this comprehensive profile, generate position recommendations that:
@@ -118,6 +135,14 @@ async function generateJobPositions(userProfile = {}) {
         Generate highly personalized, relevant job position recommendations for this specific user.
         `
         .trim();
+
+        console.log('🤖 Sending request to Groq AI with user context length:', userContext.length);
+        console.log('⚙️ AI request parameters:', {
+            model: "llama-3.1-8b-instant",
+            temperature: 0.4,
+            max_tokens: 4096,
+            response_format: "json_object"
+        });
 
         const chatCompletion = await groq.chat.completions.create({
             "messages": [
@@ -139,19 +164,37 @@ async function generateJobPositions(userProfile = {}) {
 
         const jsonStringResponse = chatCompletion.choices[0]?.message?.content;
         
+        console.log('📨 Received AI response:', {
+            hasResponse: !!jsonStringResponse,
+            responseLength: jsonStringResponse?.length || 0,
+            tokensUsed: chatCompletion.usage?.total_tokens || 'unknown'
+        });
+
         if (!jsonStringResponse) {
+            console.error('❌ No response received from AI service');
             throw new Error('No response received from AI service');
         }
 
+        console.log('🔍 Parsing AI response as JSON...');
         const aiResponse = JSON.parse(jsonStringResponse);
+        console.log('✅ Successfully parsed AI response');
         
         // Validate the response structure
         if (!aiResponse.job_positions || !Array.isArray(aiResponse.job_positions)) {
+            console.error('❌ Invalid response format:', {
+                hasJobPositions: !!aiResponse.job_positions,
+                isArray: Array.isArray(aiResponse.job_positions),
+                responseKeys: Object.keys(aiResponse)
+            });
             throw new Error('Invalid response format: missing or invalid job_positions array');
         }
 
+        console.log('📊 AI generated', aiResponse.job_positions.length, 'job positions');
+
         // Return the job positions with enhanced validation and fallbacks
         const jobPositions = aiResponse.job_positions.map((position, index) => {
+            console.log(`🔧 Processing position ${index + 1}: ${position.position_title || 'Unknown Title'}`);
+            
             // Ensure required fields exist with intelligent fallbacks based on user profile
             return {
                 position_id: position.position_id || `pos_${Date.now()}_${index}`,
@@ -161,35 +204,58 @@ async function generateJobPositions(userProfile = {}) {
                 position_summary: position.position_summary || 'Great opportunity for fresh graduates to start their career',
                 role_description: position.role_description || 'Exciting entry-level position with growth opportunities',
                 key_responsibilities: position.key_responsibilities || ['Learn and grow in the role', 'Contribute to team projects', 'Develop professional skills'],
-                required_qualifications: position.required_qualifications || [`${userProfile.highestEducation || 'Bachelor\'s degree'} or equivalent`, 'Strong communication skills'],
+                required_qualifications: position.required_qualifications || [`${welcome.highestEducation || 'Bachelor\'s degree'} or equivalent`, 'Strong communication skills'],
                 required_skills: position.required_skills || ['Communication', 'Teamwork', 'Willingness to learn'],
                 skill_development_opportunities: position.skill_development_opportunities || ['Professional communication', 'Industry-specific knowledge', 'Leadership skills'],
                 career_growth_path: position.career_growth_path || 'Opportunity to advance to senior roles with experience and skill development',
-                work_environment_fit: position.work_environment_fit || `Suitable for ${userProfile.workEnvironment || 'flexible'} work preferences`,
+                work_environment_fit: position.work_environment_fit || `Suitable for ${careerGoals.workEnvironment || userProfile.workEnvironment || 'flexible'} work preferences`,
                 career_priorities_alignment: position.career_priorities_alignment || 'Aligns with professional growth and learning opportunities',
                 industry_sector: position.industry_sector || 'General Business',
                 typical_salary_range: position.typical_salary_range || 'PHP 18,000 - 25,000 / month'
             };
         });
 
+        console.log('✨ Successfully processed all job positions');
+        console.log('📈 Final result summary:', {
+            totalPositions: jobPositions.length,
+            averageMatchScore: Math.round(jobPositions.reduce((sum, pos) => sum + pos.match_score, 0) / jobPositions.length),
+            industries: [...new Set(jobPositions.map(pos => pos.industry_sector))],
+            experienceLevels: [...new Set(jobPositions.map(pos => pos.experience_level))]
+        });
+
         return {
             success: true,
             job_positions: jobPositions,
             total_positions: jobPositions.length,
-            personalized_for: userProfile.fullName || 'User'
+            personalized_for: welcome.fullName || 'User'
         };
 
     } catch (error) {
-        console.error('Error generating personalized job positions:', error);
+        console.error('💥 Error generating personalized job positions:', {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            userProfile: {
+                hasFullName: !!welcome.fullName,
+                majorCourse: welcome.majorCourse || 'not provided'
+            }
+        });
         
         // Return a fallback response with sample positions tailored to basic profile info
-        const fallbackTitle = userProfile.majorCourse 
-            ? `${userProfile.majorCourse} Graduate Position`
+        console.log('🔄 Generating fallback response...');
+        
+        const fallbackTitle = welcome.majorCourse 
+            ? `${welcome.majorCourse} Graduate Position`
             : 'Entry-Level Assistant';
             
-        const fallbackSkills = userProfile.hardSkills && userProfile.hardSkills.length > 0
-            ? userProfile.hardSkills.slice(0, 3)
+        const fallbackSkills = skills.selectedHardSkills && skills.selectedHardSkills.length > 0
+            ? skills.selectedHardSkills.slice(0, 3)
             : ['MS Office', 'Communication', 'Teamwork'];
+
+        console.log('📝 Fallback job created:', {
+            title: fallbackTitle,
+            skills: fallbackSkills,
+            basedOnMajor: !!welcome.majorCourse
+        });
 
         return {
             success: false,
@@ -200,21 +266,21 @@ async function generateJobPositions(userProfile = {}) {
                     position_title: fallbackTitle,
                     experience_level: 'Entry-Level',
                     match_score: 80,
-                    position_summary: `Great starting position for ${userProfile.majorCourse || 'fresh graduates'}`,
+                    position_summary: `Great starting position for ${welcome.majorCourse || 'fresh graduates'}`,
                     role_description: 'An excellent opportunity to begin your career with a supportive team and structured learning environment.',
                     key_responsibilities: ['Learn company processes', 'Assist with daily operations', 'Participate in training programs'],
-                    required_qualifications: [userProfile.highestEducation || 'Bachelor\'s degree', 'Good communication skills'],
+                    required_qualifications: [welcome.highestEducation || 'Bachelor\'s degree', 'Good communication skills'],
                     required_skills: fallbackSkills,
                     skill_development_opportunities: ['Professional communication', 'Industry knowledge', 'Project management'],
                     career_growth_path: 'Opportunity to advance to specialist or supervisory roles within 2-3 years',
-                    work_environment_fit: `Suitable for ${userProfile.workEnvironment || 'flexible'} work arrangements`,
+                    work_environment_fit: `Suitable for ${careerGoals.workEnvironment || userProfile.workEnvironment || 'flexible'} work arrangements`,
                     career_priorities_alignment: 'Provides learning opportunities and career growth potential',
                     industry_sector: 'General Business',
                     typical_salary_range: 'PHP 18,000 - 22,000 / month'
                 }
             ],
             total_positions: 1,
-            personalized_for: userProfile.fullName || 'User'
+            personalized_for: welcome.fullName || 'User'
         };
     }
 }

@@ -3,14 +3,33 @@ import {
   Box,
   Typography,
   CircularProgress,
-  Fade
+  Fade,
+  Alert
 } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { getJobListings } from '../services/api'
 
-const AILoadingScreen = () => {
+const AILoadingScreen = ({ userProfile = null }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [progress, setProgress] = useState(0)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [error, setError] = useState(null)
+
+  // Get user profile from props, location state, or default
+  const profileData = userProfile || location.state?.userProfile || {
+    fullName: 'User',
+    majorCourse: 'General Studies',
+    highestEducation: 'Undergraduate',
+    graduationYear: new Date().getFullYear(),
+    hardSkills: ['Communication', 'Microsoft Office', 'Teamwork'],
+    softSkills: ['Adaptability', 'Problem Solving', 'Time Management'],
+    careerInterests: 'Open to various opportunities',
+    dreamJob: 'Seeking meaningful career opportunities',
+    workEnvironment: 'Flexible',
+    careerPriorities: ['learning-opportunities', 'career-growth']
+  }
 
   // Dynamic progress messages that cycle automatically
   const progressMessages = [
@@ -22,30 +41,72 @@ const AILoadingScreen = () => {
   ]
 
   useEffect(() => {
-    // Cycle through progress messages
-    const messageInterval = setInterval(() => {
-      setCurrentMessageIndex(prev => (prev + 1) % progressMessages.length)
-    }, 2000) // Change message every 2 seconds
+    let messageInterval
+    let progressInterval
+    
+    const generateJobListings = async () => {
+      try {
+        setIsGenerating(true)
+        setError(null)
+        
+        // Start cycling through progress messages
+        messageInterval = setInterval(() => {
+          setCurrentMessageIndex(prev => (prev + 1) % progressMessages.length)
+        }, 2000) // Change message every 2 seconds
 
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          // Navigate to explore jobs when complete
-          setTimeout(() => {
-            navigate('/jobs')
-          }, 1000)
-          return 100
-        }
-        return prev + 2 // Increase by 2% every 100ms
-      })
-    }, 100)
+        // Simulate initial progress while API loads
+        progressInterval = setInterval(() => {
+          setProgress(prev => {
+            if (prev >= 85) {
+              return prev // Stop at 85% until API responds
+            }
+            return prev + 3 // Increase by 3% every 200ms
+          })
+        }, 200)
 
-    return () => {
-      clearInterval(messageInterval)
-      clearInterval(progressInterval)
+        // Make the actual API call to generate job listings
+        const response = await getJobListings(profileData)
+        
+        // Complete the progress
+        setProgress(100)
+        
+        // Navigate to jobs page with the generated listings
+        setTimeout(() => {
+          navigate('/jobs', { 
+            state: { 
+              jobListings: response.job_positions,
+              userProfile: profileData,
+              generationSuccess: response.success,
+              totalPositions: response.total_positions
+            } 
+          })
+        }, 1000)
+        
+      } catch (error) {
+        console.error('Error generating job listings:', error)
+        setError('Failed to generate personalized job recommendations. Please try again.')
+        setProgress(0)
+        
+        // Show error for 3 seconds then navigate back
+        setTimeout(() => {
+          navigate(-1) // Go back to previous page
+        }, 3000)
+      } finally {
+        setIsGenerating(false)
+        if (messageInterval) clearInterval(messageInterval)
+        if (progressInterval) clearInterval(progressInterval)
+      }
     }
-  }, [navigate, progressMessages.length])
+
+    // Start the job generation process
+    generateJobListings()
+
+    // Cleanup function
+    return () => {
+      if (messageInterval) clearInterval(messageInterval)
+      if (progressInterval) clearInterval(progressInterval)
+    }
+  }, [navigate, progressMessages.length, profileData])
 
   return (
     <Box
@@ -89,11 +150,31 @@ const AILoadingScreen = () => {
           zIndex: 1
         }}
       >
+        {/* Error Alert */}
+        {error && (
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 4,
+              maxWidth: 600,
+              backgroundColor: 'rgba(211, 47, 47, 0.1)',
+              color: '#d32f2f',
+              '& .MuiAlert-icon': {
+                color: '#d32f2f'
+              }
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+
         {/* Central Animated Graphic */}
         <Box
           sx={{
             position: 'relative',
-            mb: 6
+            mb: 6,
+            opacity: error ? 0.5 : 1,
+            transition: 'opacity 0.3s ease'
           }}
         >
           {/* Outer rotating circle */}
@@ -215,14 +296,20 @@ const AILoadingScreen = () => {
           variant="h3"
           component="h1"
           sx={{
-            color: '#2c3e50',
+            color: error ? '#d32f2f' : '#2c3e50',
             fontWeight: 700,
             mb: 4,
             fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
-            lineHeight: 1.2
+            lineHeight: 1.2,
+            transition: 'color 0.3s ease'
           }}
         >
-          Crafting your personalized career path...
+          {error 
+            ? 'Oops! Something went wrong...' 
+            : isGenerating 
+              ? `Crafting your personalized career path, ${profileData.fullName}...`
+              : 'Crafting your personalized career path...'
+          }
         </Typography>
 
         {/* Dynamic Progress Messages */}
@@ -235,63 +322,83 @@ const AILoadingScreen = () => {
             mb: 4
           }}
         >
-          <Fade in={true} timeout={500} key={currentMessageIndex}>
+          {!error && (
+            <Fade in={true} timeout={500} key={currentMessageIndex}>
+              <Typography
+                variant="h6"
+                component="p"
+                sx={{
+                  color: '#7f8c8d',
+                  fontWeight: 400,
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  textAlign: 'center',
+                  maxWidth: 600,
+                  px: 2
+                }}
+              >
+                {progressMessages[currentMessageIndex]}
+              </Typography>
+            </Fade>
+          )}
+          {error && (
             <Typography
-              variant="h6"
+              variant="body1"
               component="p"
               sx={{
                 color: '#7f8c8d',
                 fontWeight: 400,
-                fontSize: { xs: '1rem', sm: '1.125rem' },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
                 textAlign: 'center',
                 maxWidth: 600,
                 px: 2
               }}
             >
-              {progressMessages[currentMessageIndex]}
+              Redirecting you back in a moment...
             </Typography>
-          </Fade>
+          )}
         </Box>
 
         {/* Progress Indicator */}
-        <Box
-          sx={{
-            width: { xs: 280, sm: 350 },
-            textAlign: 'center'
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#2980b9',
-              fontWeight: 600,
-              mb: 1,
-              fontSize: '0.875rem'
-            }}
-          >
-            {Math.round(progress)}% Complete
-          </Typography>
-          
+        {!error && (
           <Box
             sx={{
-              width: '100%',
-              height: 6,
-              backgroundColor: '#ecf0f1',
-              borderRadius: 3,
-              overflow: 'hidden'
+              width: { xs: 280, sm: 350 },
+              textAlign: 'center'
             }}
           >
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#2980b9',
+                fontWeight: 600,
+                mb: 1,
+                fontSize: '0.875rem'
+              }}
+            >
+              {Math.round(progress)}% Complete
+            </Typography>
+            
             <Box
               sx={{
-                width: `${progress}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, #2980b9 0%, #e67e22 100%)',
-                transition: 'width 0.3s ease-in-out',
-                borderRadius: 3
+                width: '100%',
+                height: 6,
+                backgroundColor: '#ecf0f1',
+                borderRadius: 3,
+                overflow: 'hidden'
               }}
-            />
+            >
+              <Box
+                sx={{
+                  width: `${progress}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #2980b9 0%, #e67e22 100%)',
+                  transition: 'width 0.3s ease-in-out',
+                  borderRadius: 3
+                }}
+              />
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
 
       {/* Custom CSS animations */}

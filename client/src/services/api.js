@@ -7,4 +7,6 @@ const api = axios.create({
     baseURL: BASE_URL
 });
 
-export const getJobListings = async () => api.get('/jobs');
+export const getJobListings = (userProfile) => api.post('/jobs', { userProfile });
+
+export default api;
