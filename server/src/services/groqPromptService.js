@@ -39,7 +39,7 @@ When analyzing the user profile, pay special attention to:
 - Focus on entry-level positions with clear growth potential
 
 ### Output Format Requirements
-Return a JSON object with "job_positions" array containing 5 position objects. Each position must have:
+Return a JSON object with "job_positions" array containing 10 position objects. Each position must have:
 - position_id, position_title, experience_level, match_score
 - position_summary (explain WHY this specific user would excel)
 - role_description (connect to their background and goals)
@@ -162,7 +162,7 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
         
         **CRITICAL**: Reference their actual skills, major, and goals in job descriptions. Make it obvious why THIS specific user is perfect for each role.
         
-        Generate 5 highly personalized job recommendations that feel hand-selected for this individual.
+        Generate 10 highly personalized job recommendations that feel hand-selected for this individual.
         `
         .trim();
 
@@ -183,9 +183,10 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
         console.log('⚙️ Enhanced AI request parameters:', {
             model: "meta-llama/llama-4-maverick-17b-128e-instruct",
             temperature: aiTemperature,
-            max_tokens: 5120,
+            max_tokens: 8192, // Increased for 10 positions
             response_format: "json_object",
-            mode: isRefresh ? "creative_refresh" : "focused_initial"
+            mode: isRefresh ? "creative_refresh" : "focused_initial",
+            targetPositions: 10
         });
 
         const chatCompletion = await groq.chat.completions.create({
@@ -201,7 +202,7 @@ async function generateJobPositions(userProfile = {}, isRefresh = false) {
             ],
             "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
             "temperature": aiTemperature, // Dynamic based on refresh mode
-            "max_completion_tokens": 5120,
+            "max_completion_tokens": 8192, // Increased for 10 positions
             "top_p": aiTopP, // Dynamic sampling based on refresh mode
             "response_format": { "type": "json_object" }
         });
