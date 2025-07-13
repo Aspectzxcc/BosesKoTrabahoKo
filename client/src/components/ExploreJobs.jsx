@@ -24,8 +24,6 @@ import {
   FilterList,
   Work,
   Schedule,
-  Bookmark,
-  BookmarkBorder,
   Person,
   School,
   BusinessCenter
@@ -38,7 +36,6 @@ const ExploreJobs = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [industryFilter, setIndustryFilter] = useState('')
   const [jobType, setJobType] = useState('')
-  const [savedJobs, setSavedJobs] = useState([])
   const [filteredJobs, setFilteredJobs] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -144,14 +141,6 @@ const ExploreJobs = () => {
 
     setFilteredJobs(filtered)
   }, [searchQuery, industryFilter, jobType, apiJobListings])
-
-  const handleSaveJob = (jobId) => {
-    setSavedJobs(prev => 
-      prev.includes(jobId) 
-        ? prev.filter(id => id !== jobId)
-        : [...prev, jobId]
-    )
-  }
 
   const handleViewDetails = (job) => {
     // Navigate to job detail page with job data
@@ -301,13 +290,6 @@ const ExploreJobs = () => {
               >
                 {job.matchScore}% Match
               </Typography>
-              <IconButton
-                size="small"
-                onClick={() => handleSaveJob(job.id)}
-                sx={{ color: '#7f8c8d' }}
-              >
-                {savedJobs.includes(job.id) ? <Bookmark /> : <BookmarkBorder />}
-              </IconButton>
             </Box>
             
             <Button

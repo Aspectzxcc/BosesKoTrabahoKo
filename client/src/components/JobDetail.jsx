@@ -22,8 +22,6 @@ import {
 } from '@mui/material'
 import {
   ArrowBack,
-  Bookmark,
-  BookmarkBorder,
   SmartToy,
   Work,
   School,
@@ -37,7 +35,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 const JobDetail = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const [isSaved, setIsSaved] = useState(false)
   const [showAIDialog, setShowAIDialog] = useState(false)
 
   // Get job data from navigation state
@@ -81,10 +78,6 @@ const JobDetail = () => {
     if (score >= 80) return '#f39c12' // Orange
     if (score >= 70) return '#e67e22' // Dark Orange
     return '#e74c3c' // Red
-  }
-
-  const handleSavePosition = () => {
-    setIsSaved(!isSaved)
   }
 
   const AIAdviceDialog = () => (
@@ -216,9 +209,18 @@ const JobDetail = () => {
         py: 4
       }}
     >
-      <Container maxWidth="lg">
+      <Container 
+        maxWidth="lg"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
         {/* Back Navigation */}
-        <Button
+        <Box sx={{ width: '100%', mb: 3, display: 'flex', justifyContent: 'flex-start' }}>
+          <Button
           startIcon={<ArrowBack />}
           onClick={() => fromExploreJobs ? navigate('/jobs') : navigate(-1)}
           sx={{
@@ -228,12 +230,20 @@ const JobDetail = () => {
             '&:hover': {
               backgroundColor: 'rgba(127, 140, 141, 0.05)'
             }
+          }}          >
+            Back to Position Listings
+          </Button>
+        </Box>
+
+        <Grid 
+          container 
+          spacing={4}
+          sx={{
+            justifyContent: 'center',
+            maxWidth: '1200px',
+            width: '100%'
           }}
         >
-          Back to Position Listings
-        </Button>
-
-        <Grid container spacing={4}>
           {/* Left Column - Position Summary & Actions */}
           <Grid item xs={12} md={4}>
             <Card
@@ -307,23 +317,6 @@ const JobDetail = () => {
                 </Box>
 
                 {/* Action Buttons */}
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  startIcon={isSaved ? <Bookmark /> : <BookmarkBorder />}
-                  onClick={handleSavePosition}
-                  sx={{
-                    borderColor: '#2980b9',
-                    color: '#2980b9',
-                    borderRadius: '8px',
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    mb: 2
-                  }}
-                >
-                  {isSaved ? 'Saved Position' : 'Save Position'}
-                </Button>
-
                 <Button
                   variant="outlined"
                   fullWidth
