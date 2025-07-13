@@ -147,7 +147,7 @@ async function generateJobPositions(userProfile = {}) {
         });
         
         console.log('⚙️ Enhanced AI request parameters:', {
-            model: "llama-3.1-8b-instant",
+            model: "meta-llama/llama-4-maverick-17b-128e-instruct",
             temperature: 0.3, // Lower for more focused, consistent responses
             max_tokens: 5120, // Increased for detailed personalization
             response_format: "json_object"
@@ -164,7 +164,7 @@ async function generateJobPositions(userProfile = {}) {
                     "content": userContext
                 }
             ],
-            "model": "llama-3.1-8b-instant",
+            "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
             "temperature": 0.3, // More focused responses
             "max_completion_tokens": 5120, // Increased token limit for detailed descriptions
             "top_p": 0.9, // More focused sampling
