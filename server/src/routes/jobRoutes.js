@@ -3,6 +3,7 @@ const jobController = require('../controllers/jobController');
 
 const router = Router();
 
-router.get('/', jobController.getJobListings);
+// Route to generate job listings
+router.post('/', jobController.generateJobListings);
 
 module.exports = router;

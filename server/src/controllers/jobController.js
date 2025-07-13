@@ -1,8 +1,8 @@
 const groqService = require('../services/groqJobListingService.js');
 
-const getJobListings = async (req, res) => {
+const generateJobListings = async (req, res) => {
     try {
-        const jobListings = await groqService.fetchJobListings();
+        const jobListings = await groqService.generateJobPositions();
         res.json(jobListings);
     } catch (error) {
         console.error('Error fetching job listings:', error);
@@ -11,5 +11,5 @@ const getJobListings = async (req, res) => {
 };
 
 module.exports = {
-    getJobListings
+    generateJobListings
 };

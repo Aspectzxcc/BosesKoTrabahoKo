@@ -83,10 +83,27 @@ const OnboardingCareerGoals = () => {
   }
 
   const handleFinishSetup = () => {
-    // Here you would typically save all the onboarding data
-    console.log('Dream Job:', dreamJob)
-    console.log('Work Environment:', workEnvironment)
-    console.log('Selected Goals:', selectedGoals)
+    // Get existing onboarding data from localStorage
+    const existingData = JSON.parse(localStorage.getItem('onboardingData') || '{}')
+    
+    // Create career goals data object
+    const careerGoalsData = {
+      dreamJob,
+      workEnvironment,
+      selectedGoals
+    }
+    
+    // Update localStorage with career goals data
+    const updatedData = {
+      ...existingData,
+      careerGoals: careerGoalsData
+    }
+    
+    localStorage.setItem('onboardingData', JSON.stringify(updatedData))
+    
+    // Log for debugging
+    console.log('Career Goals Data saved:', careerGoalsData)
+    console.log('Complete Onboarding Data:', updatedData)
     
     navigate('/onboarding/loading')
   }

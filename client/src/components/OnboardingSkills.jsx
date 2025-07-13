@@ -58,10 +58,27 @@ const OnboardingSkills = () => {
   }
 
   const handleNext = () => {
-    // Here you would typically save the data
-    console.log('Selected Hard Skills:', selectedHardSkills)
-    console.log('Selected Soft Skills:', selectedSoftSkills)
-    console.log('Career Interests:', careerInterests)
+    // Get existing onboarding data from localStorage
+    const existingData = JSON.parse(localStorage.getItem('onboardingData') || '{}')
+    
+    // Create skills data object
+    const skillsData = {
+      selectedHardSkills,
+      selectedSoftSkills,
+      careerInterests
+    }
+    
+    // Update localStorage with skills data
+    const updatedData = {
+      ...existingData,
+      skills: skillsData
+    }
+    
+    localStorage.setItem('onboardingData', JSON.stringify(updatedData))
+    
+    // Log for debugging
+    console.log('Skills Data saved:', skillsData)
+    console.log('Complete Onboarding Data:', updatedData)
     
     navigate('/onboarding/career-goals')
   }
